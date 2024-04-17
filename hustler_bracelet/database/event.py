@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from peewee import *
 
 from hustler_bracelet.database.category import CategoryTable
@@ -9,6 +11,8 @@ class EventTable(Model):
     name = TextField(null=False)
     value = FloatField(null=False)
     category = ForeignKeyField(CategoryTable, backref='events', null=False)
+
+    timestamp = FloatField(null=False)
 
     data_json = TextField(null=False, default='{}')
 

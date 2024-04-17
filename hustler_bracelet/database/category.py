@@ -1,14 +1,8 @@
-from enum import Enum
-
 from peewee import *
 
 from hustler_bracelet.database import UserTable
 from hustler_bracelet.database.engine import database_engine
-
-
-class CategoryType(str, Enum):
-    income = 'income'
-    spend = 'spend'
+from hustler_bracelet.enums import CategoryType
 
 
 class CategoryTable(Model):

@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from hustler_bracelet.controllers.calendar import CalendarEvent, Calendar
+from hustler_bracelet.controllers.event import Event
 from hustler_bracelet.database import UserData, UserTable
 
 
@@ -27,16 +27,16 @@ class User:
 
         return new_user
 
-    def get_events(self, day: date = date.today()) -> list[CalendarEvent]:
+    def get_events_list_by_date(self, min_date: date, max_date: date | None = None, limit: int | None = None) -> list[Event]:
         pass
 
-    def get_event_history(self) -> list[CalendarEvent]:
+    def get_events_list(self) -> list[Event]:
         pass
 
-    def add_event(self, event: CalendarEvent, date_and_time: datetime | None = None) -> Calendar:
+    def add_event(self, event: Event, date_and_time: datetime | None = None):
         date_and_time = date_and_time or datetime.now()
 
         pass
 
-    def remove_event(self, event: CalendarEvent) -> Calendar:
+    def remove_event(self, event: Event):
         pass
