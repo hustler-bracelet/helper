@@ -24,7 +24,23 @@ class Category:
         if isinstance(self.user, int):
             self.user = User(self.user)
 
-        self._db_instance = self._db_instance or CategoryTable.get_by_id(self.id)
+        try:
+            self._db_instance = self._db_instance or CategoryTable.get_by_id(self.id)
+        except:
+            self._db_instance = CategoryTable(
+                id=self.id,
+                name=self.name,
+                category_type=self.type,
+                user=self.user.id
+            )
+            self._db_instance.save(force_insert=True)
+
+    def save(self):
+        self._db_instance.name = self.name
+        self._db_instance.category_type = self.type
+        self._db_instance.user = self.user.id
+
+        self._db_instance.save(force_insert=True)
 
     @classmethod
     def get_by_id(cls, id_: int):
@@ -44,28 +60,23 @@ class Category:
     def delete(self):
         self._db_instance.delete_instance()
 
-    def rename(self, new_name: str):
-        self._db_instance.name = new_name
-
-        self._db_instance.save(force_insert=True)
-
-    def iterate_events(self, limit: int | None = None):
-        query = self._db_instance.events.where(EventTable.timestamp)
+    def iter_events(self, limit: int | None = None):
+        query = self._db_instance.events
         if limit is not None:
             query = query.limit(limit)
 
         from hustler_bracelet.controllers.event import Event
-        yield from (Event.get_by_id(db_event) for db_event in query)
+        yield from (Event.from_db_instance(db_event) for db_event in query)
 
-    def iterate_events_by_date(self, min_date: date, max_date: date | None = None, limit: int | None = None):
+    def iter_events_filtered_by_date(self, min_date: date, max_date: date | None = None, limit: int | None = None):
         max_date = max_date or min_date
 
-        for event in self.iterate_events(limit=limit):
-            if min_date >= datetime.fromtimestamp(event.timestamp).date() >= max_date:
+        for event in self.iter_events(limit=limit):
+            if min_date >= event.timestamp.date() >= max_date:
                 yield event
 
     def get_events_list(self, limit: int | None = None):
-        return [*self.iterate_events(limit=limit)]
+        return [*self.iter_events(limit=limit)]
 
-    def get_events_list_by_date(self, min_date: date, max_date: date | None = None, limit: int | None = None):
-        return [*self.iterate_events_by_date(min_date=min_date, max_date=max_date, limit=limit)]
+    def get_events_list_filtered_by_date(self, min_date: date, max_date: date | None = None, limit: int | None = None):
+        return [*self.iter_events_filtered_by_date(min_date=min_date, max_date=max_date, limit=limit)]

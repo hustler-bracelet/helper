@@ -1,5 +1,3 @@
-from datetime import date, datetime
-
 from peewee import *
 
 from hustler_bracelet.database.category import CategoryTable
