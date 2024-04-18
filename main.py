@@ -1,14 +1,23 @@
-from hustler_bracelet.database import UserTable, CategoryTable, EventTable
+from __future__ import annotations
 
-user = UserTable.get_by_id(0)
-category1 = CategoryTable.get_by_id(0)
-category2 = CategoryTable.get_by_id(1)
-event1 = EventTable.get_by_id(0)
-event2 = EventTable.get_by_id(1)
+import asyncio
 
-query = (
-    category1.events.where(EventTable.id == 1)
-)
+from hustler_bracelet import bot
+from hustler_bracelet.controllers.category import Category
 
-for event in query:
-    print(event.name)
+# from hustler_bracelet.database import UserTable, CategoryTable, EventTable
+#
+# user = UserTable.get_by_id(0)
+# category1 = CategoryTable.get_by_id(0)
+# category2 = CategoryTable.get_by_id(1)
+# event1 = EventTable.get_by_id(0)
+# event2 = EventTable.get_by_id(1)
+#
+# query = (
+#     category1.events.where(EventTable.id == 1)
+# )
+#
+# for event in query:
+#     print(event.name)
+
+asyncio.run(bot.main())
