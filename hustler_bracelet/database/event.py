@@ -10,7 +10,7 @@ class EventTable(Model):
     value = FloatField(null=False)
     category = ForeignKeyField(CategoryTable, backref='events', null=False)
 
-    timestamp = FloatField(null=False)
+    date_ordinal = IntegerField(null=False)
 
     data_json = TextField(null=False, default='{}')
 
