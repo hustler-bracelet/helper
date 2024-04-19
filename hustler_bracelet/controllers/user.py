@@ -56,13 +56,14 @@ class User:
         self._db_instance.delete_instance()
 
     def iter_events(self, limit: int | None = None):
-        query = self._db_instance.events
-        if limit is not None:
-            query = query.limit(limit)
+        """
+        :param limit: Лимит на каждую категорию, т.е. из каждой категории может прийти не больше чем limit ивентов
+        :return:
+        """
 
-        from hustler_bracelet.controllers.event import Event
-        yield from (Event.get_by_id(db_event.id) for db_event in query)
-    
+        for category in self.iter_categories():
+            yield from category.iter_events(limit=limit)
+
     def iter_events_filtered_by_date(self, min_date: date, max_date: date | None = None, limit: int | None = None):
         max_date = max_date or min_date
 
@@ -77,7 +78,7 @@ class User:
         return [*self.iter_events_filtered_by_date(min_date=min_date, max_date=max_date, limit=limit)]
 
     def iter_categories(self, limit: int | None = None):
-        query = CategoryTable.select().where(CategoryTable.user == self._db_instance)
+        query = self._db_instance.categories
 
         if limit is not None:
             query = query.limit(limit)

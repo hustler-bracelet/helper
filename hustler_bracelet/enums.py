@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class CategoryType(str, Enum):
-    income = 'income'
-    spend = 'spend'
+class FinanceEventType(str, Enum):
+    INCOME = 'income'
+    SPEND = 'spend'

@@ -1,2 +1,3 @@
 peewee
 aiogram
+aiogram_dialog

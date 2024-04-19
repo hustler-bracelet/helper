@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .user import UserTable, UserData
-from .category import CategoryType, CategoryTable
+from .category import FinanceEventType, CategoryTable
 from .event import EventTable
 
 UserTable.create_table(safe=True)

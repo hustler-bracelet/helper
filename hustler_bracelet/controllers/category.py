@@ -5,21 +5,21 @@ from datetime import datetime, date
 
 from hustler_bracelet.controllers.user import User
 from hustler_bracelet.database import CategoryTable, EventTable
-from hustler_bracelet.enums import CategoryType
+from hustler_bracelet.enums import FinanceEventType
 
 
 @dataclass()
 class Category:
     id: int
     name: str
-    type: CategoryType | str
+    type: FinanceEventType | str
     user: User | int
 
     _db_instance: CategoryTable | None = None
 
     def __post_init__(self):
-        if not isinstance(self.type, CategoryType):
-            self.type = CategoryType(self.type)
+        if not isinstance(self.type, FinanceEventType):
+            self.type = FinanceEventType(self.type)
 
         if isinstance(self.user, int):
             self.user = User(self.user)

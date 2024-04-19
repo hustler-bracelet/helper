@@ -1,40 +1,93 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, F, Router
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.filters import ExceptionTypeFilter
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove
+from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
+from aiogram_dialog.api.exceptions import UnknownIntent
 
 import config
-from .handlers import router
+from hustler_bracelet.bot.bot_dialogs.finance.add_category import add_finance_category_dialog
+from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_event_dialog
+from .bot_dialogs import states
+from .bot_dialogs.counter import counter_dialog
+from .bot_dialogs.layouts import layouts_dialog
+from .bot_dialogs.main import main_dialog
+from .bot_dialogs.mutltiwidget import multiwidget_dialog
+from .bot_dialogs.reply_buttons import reply_kbd_dialog
+from .bot_dialogs.scrolls import scroll_dialog
+from .bot_dialogs.select import selects_dialog
+from .bot_dialogs.switch import switch_dialog
+
+
+async def start(message: Message, dialog_manager: DialogManager):
+    # it is important to reset stack because user wants to restart everything
+    await dialog_manager.start(states.Main.MAIN, mode=StartMode.RESET_STACK)
+
+
+async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
+    # Example of handling UnknownIntent Error and starting new dialog.
+    logging.error("Restarting dialog: %s", event.exception)
+    if event.update.callback_query:
+        await event.update.callback_query.answer(
+            "Bot process was restarted due to maintenance.\n"
+            "Redirecting to main menu.",
+        )
+        if event.update.callback_query.message:
+            try:
+                await event.update.callback_query.message.delete()
+            except TelegramBadRequest:
+                pass  # whatever
+    elif event.update.message:
+        await event.update.message.answer(
+            "Bot process was restarted due to maintenance.\n"
+            "Redirecting to main menu.",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+    await dialog_manager.start(
+        states.Main.MAIN,
+        mode=StartMode.RESET_STACK,
+        show_mode=ShowMode.SEND,
+    )
+
+
+dialog_router = Router()
+dialog_router.include_routers(
+    layouts_dialog,
+    scroll_dialog,
+    main_dialog,
+    add_event_dialog,
+    add_finance_category_dialog,
+    selects_dialog,
+    counter_dialog,
+    multiwidget_dialog,
+    switch_dialog,
+    reply_kbd_dialog,
+)
+
+
+def setup_dp():
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
+    dp.message.register(start, F.text == "/start")
+    dp.errors.register(
+        on_unknown_intent,
+        ExceptionTypeFilter(UnknownIntent),
+    )
+    dp.include_router(dialog_router)
+    setup_dialogs(dp)
+    return dp
 
 
 async def main():
-    logging.basicConfig(level=logging.DEBUG)
-    bot = Bot(config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML)
-
-    await bot.set_my_commands(
-        [
-            types.BotCommand(command='start', description='Перезапуск бота'),
-            types.BotCommand(command='cancel', description='Выход из диалога')
-        ]
-    )
-
-    dp = Dispatcher()
-    dp.include_router(router)
-
-    # loop_task: Optional[Task] = None
-    #
-    # async def on_startup():
-    #     nonlocal loop_task
-    #     loop_task = asyncio.create_task(loop(bot))
-    #
-    # def on_shutdown():
-    #     nonlocal loop_task
-    #     loop_task.cancel()
-    #
-    # dp.startup.register(on_startup)
-    # dp.shutdown.register(on_shutdown)
-
+    # real main
+    logging.basicConfig(level=logging.INFO)
+    bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.MARKDOWN)
+    dp = setup_dp()
     await dp.start_polling(bot)
 
 
