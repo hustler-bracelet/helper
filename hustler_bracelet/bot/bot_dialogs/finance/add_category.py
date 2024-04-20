@@ -5,7 +5,7 @@ from aiogram_dialog.widgets.kbd import Row, Button
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.bot_dialogs import states
-from hustler_bracelet.bot.utils import finance_event_name_getter
+from hustler_bracelet.bot.lang_utils import finance_event_words_getter
 from hustler_bracelet.enums import FinanceEventType
 
 
@@ -50,7 +50,7 @@ add_finance_category_dialog = Dialog(
     Window(
         Format('Какое имя будет у новой категории {finance_event_name}?'),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
-        state=states.AddFinanceCategory.GET_NAME
+        state=states.AddFinanceCategory.ENTER_NAME
     ),
-    getter=finance_event_name_getter,
+    getter=finance_event_words_getter,
 )

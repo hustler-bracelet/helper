@@ -86,7 +86,7 @@ def setup_dp():
 async def main():
     # real main
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.MARKDOWN)
+    bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML)
     dp = setup_dp()
     await dp.start_polling(bot)
 

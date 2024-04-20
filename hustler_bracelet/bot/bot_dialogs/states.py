@@ -38,12 +38,14 @@ class Calendar(StatesGroup):
 
 class AddFinanceEvent(StatesGroup):
     MAIN = State()
-    CHOOSE_CATEGORY = State()
+    ENTER_VALUE = State()
+    CHOOSE_DATE = State()
+    FINAL = State()
 
 
 class AddFinanceCategory(StatesGroup):
     MAIN = State()
-    GET_NAME = State()
+    ENTER_NAME = State()
     FINAL = State()
 
 
