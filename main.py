@@ -10,15 +10,13 @@ from hustler_bracelet.finance.manager import FinanceManager
 
 create_all_tables()
 finance_manager = FinanceManager(telegram_id=6567176437, telegram_name='Дмитрий')
-finance_manager.get_all_categories(category_type=FinanceTransactionType.INCOME)
-finance_manager.create_new_category(
-    name='Тестовая категория дохода',
-    category_type=FinanceTransactionType.INCOME
+all_categories = finance_manager.get_all_categories(category_type=FinanceTransactionType.INCOME)
+print(finance_manager.get_balance())
+finance_manager.add_income(
+    category=all_categories[0],
+    value=1500
 )
-finance_manager.create_new_category(
-    name='Тестовая категория расхода',
-    category_type=FinanceTransactionType.SPEND
-)
+print(finance_manager.get_balance())
 
 
 exit()

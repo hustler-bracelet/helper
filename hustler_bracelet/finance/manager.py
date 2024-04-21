@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from datetime import date, datetime
 from typing import Sequence
 from uuid import uuid4 as create_uuid_v4
 
@@ -7,6 +7,7 @@ from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError
 from hustler_bracelet.database.user import User
 from hustler_bracelet.database.category import Category
+from hustler_bracelet.database.finance_transaction import FinanceTransaction
 from sqlmodel import Session, select
 
 from hustler_bracelet.enums import FinanceTransactionType
@@ -38,6 +39,13 @@ class FinanceManager:
             self._session.commit()
         return new_user
 
+    def get_balance(self) -> float:
+        with self._session:
+            user = self._session.exec(
+                select(User).where(User.telegram_id == self._telegram_id)
+            ).first()
+        return user.current_balance
+
     def get_all_categories(self, category_type: FinanceTransactionType) -> Sequence[Category]:
         with self._session:
             query_results = self._session.exec(
@@ -46,7 +54,6 @@ class FinanceManager:
                     and Category.type == category_type
                 )
             ).all()
-            print(query_results)
         return query_results
 
     def create_new_category(self, name: str, category_type: FinanceTransactionType) -> Category:
@@ -77,3 +84,25 @@ class FinanceManager:
         with self._session:
             self._session.delete(category_to_delete)
             self._session.commit()
+
+    def add_income(self, category: Category, value: int | float, transaction_date: date = date.today()):
+        value = float(value)
+        with self._session:
+            finance_transaction = FinanceTransaction(
+                uuid=str(create_uuid_v4()),
+                telegram_id=self._telegram_id,
+                type=FinanceTransactionType.INCOME,
+                category=category.uuid,
+                value=value,
+                added_on=datetime.now(),
+                transaction_date=transaction_date
+            )
+            self._session.add(finance_transaction)
+
+            user = self._session.exec(
+                select(User).where(User.telegram_id == self._telegram_id)
+            ).first()
+            user.current_balance += value
+
+            self._session.commit()
+        return

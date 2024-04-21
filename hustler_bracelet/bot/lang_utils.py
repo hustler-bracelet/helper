@@ -5,7 +5,7 @@ from hustler_bracelet.enums import FinanceTransactionType
 
 def get_finance_event_type_name(finance_event_type: FinanceTransactionType):
     mapping = {
-        FinanceTransactionType.SPEND: 'расход',
+        FinanceTransactionType.SPENDING: 'расход',
         FinanceTransactionType.INCOME: 'доход',
     }
     return mapping[finance_event_type]
@@ -13,7 +13,7 @@ def get_finance_event_type_name(finance_event_type: FinanceTransactionType):
 
 def get_finance_event_type_verb(finance_event_type: FinanceTransactionType):
     mapping = {
-        FinanceTransactionType.SPEND: 'потратил',
+        FinanceTransactionType.SPENDING: 'потратил',
         FinanceTransactionType.INCOME: 'заработал',
     }
     return mapping[finance_event_type]
@@ -21,7 +21,7 @@ def get_finance_event_type_verb(finance_event_type: FinanceTransactionType):
 
 def get_finance_event_type_emoji(finance_event_type: FinanceTransactionType):
     mapping = {
-        FinanceTransactionType.SPEND: '💳',
+        FinanceTransactionType.SPENDING: '💳',
         FinanceTransactionType.INCOME: '🤑',
     }
     return mapping[finance_event_type]

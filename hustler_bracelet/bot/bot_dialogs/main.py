@@ -46,7 +46,7 @@ main_dialog = Dialog(
             text=Const("💳 Добавить расход"),
             id="add_spend",
             state=states.AddFinanceEvent.MAIN,
-            data={'event_type': FinanceTransactionType.SPEND}
+            data={'event_type': FinanceTransactionType.SPENDING}
         ),
         Start(
             text=Const("💯 Counter and Progress"),
