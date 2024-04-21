@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .finance_transaction_type import FinanceTransactionType
 from sqlmodel import SQLModel, Field
+
+from hustler_bracelet.enums import FinanceTransactionType
 
 
 class Category(SQLModel, table=True):

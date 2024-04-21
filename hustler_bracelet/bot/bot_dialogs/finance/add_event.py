@@ -15,7 +15,7 @@ from hustler_bracelet.bot.bot_dialogs import states
 from hustler_bracelet.bot.bot_dialogs.common import MAIN_MENU_BUTTON
 from hustler_bracelet.bot.callbacks import CategoryForNewEventCallback
 from hustler_bracelet.bot.lang_utils import get_finance_event_type_verb, finance_event_words_getter
-from hustler_bracelet.enums import FinanceEventType
+from hustler_bracelet.enums import FinanceTransactionType
 
 
 async def on_date_clicked(

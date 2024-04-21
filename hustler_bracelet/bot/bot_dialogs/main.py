@@ -3,7 +3,7 @@ from aiogram_dialog.about import about_aiogram_dialog_button
 from aiogram_dialog.widgets.kbd import Start
 from aiogram_dialog.widgets.text import Const
 from . import states
-from ...enums import FinanceEventType
+from ...enums import FinanceTransactionType
 
 main_dialog = Dialog(
     Window(
@@ -40,13 +40,13 @@ main_dialog = Dialog(
             text=Const("🤑 Добавить доход"),
             id="add_income",
             state=states.AddFinanceEvent.MAIN,
-            data={'event_type': FinanceEventType.INCOME}
+            data={'event_type': FinanceTransactionType.INCOME}
         ),
         Start(
             text=Const("💳 Добавить расход"),
             id="add_spend",
             state=states.AddFinanceEvent.MAIN,
-            data={'event_type': FinanceEventType.SPEND}
+            data={'event_type': FinanceTransactionType.SPEND}
         ),
         Start(
             text=Const("💯 Counter and Progress"),

@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.bot_dialogs import states
 from hustler_bracelet.bot.lang_utils import finance_event_words_getter
-from hustler_bracelet.enums import FinanceEventType
+from hustler_bracelet.enums import FinanceTransactionType
 
 
 async def on_category_type_click(
@@ -14,7 +14,7 @@ async def on_category_type_click(
         button: Button,
         manager: DialogManager
 ):
-    manager.dialog_data['event_type'] = FinanceEventType(button.widget_id.split('_')[-1])
+    manager.dialog_data['event_type'] = FinanceTransactionType(button.widget_id.split('_')[-1])
 
     await manager.next()
 

@@ -6,8 +6,10 @@ from uuid import uuid4 as create_uuid_v4
 from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.database.exceptions import CategoryAlreadyExists
 from hustler_bracelet.database.user import User
-from hustler_bracelet.database.category import Category, FinanceTransactionType
+from hustler_bracelet.database.category import Category
 from sqlmodel import Session, select
+
+from hustler_bracelet.enums import FinanceTransactionType
 
 
 class FinanceManager:

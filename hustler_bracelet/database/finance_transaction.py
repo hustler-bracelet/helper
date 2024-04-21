@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from sqlmodel import SQLModel, Field
-from .finance_transaction_type import FinanceTransactionType
 from datetime import datetime, date
+
+from hustler_bracelet.enums import FinanceTransactionType
 
 
 class FinanceTransaction(SQLModel, table=True):

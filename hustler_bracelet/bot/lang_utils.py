@@ -1,28 +1,28 @@
 from aiogram_dialog import DialogManager
 
-from hustler_bracelet.enums import FinanceEventType
+from hustler_bracelet.enums import FinanceTransactionType
 
 
-def get_finance_event_type_name(finance_event_type: FinanceEventType):
+def get_finance_event_type_name(finance_event_type: FinanceTransactionType):
     mapping = {
-        FinanceEventType.SPEND: 'расход',
-        FinanceEventType.INCOME: 'доход',
+        FinanceTransactionType.SPEND: 'расход',
+        FinanceTransactionType.INCOME: 'доход',
     }
     return mapping[finance_event_type]
 
 
-def get_finance_event_type_verb(finance_event_type: FinanceEventType):
+def get_finance_event_type_verb(finance_event_type: FinanceTransactionType):
     mapping = {
-        FinanceEventType.SPEND: 'потратил',
-        FinanceEventType.INCOME: 'заработал',
+        FinanceTransactionType.SPEND: 'потратил',
+        FinanceTransactionType.INCOME: 'заработал',
     }
     return mapping[finance_event_type]
 
 
-def get_finance_event_type_emoji(finance_event_type: FinanceEventType):
+def get_finance_event_type_emoji(finance_event_type: FinanceTransactionType):
     mapping = {
-        FinanceEventType.SPEND: '💳',
-        FinanceEventType.INCOME: '🤑',
+        FinanceTransactionType.SPEND: '💳',
+        FinanceTransactionType.INCOME: '🤑',
     }
     return mapping[finance_event_type]
 

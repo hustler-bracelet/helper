@@ -4,7 +4,7 @@ import asyncio
 
 from hustler_bracelet import bot
 from hustler_bracelet.database.engine import create_all_tables
-from hustler_bracelet.database.finance_transaction_type import FinanceTransactionType
+from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
 
 
@@ -17,7 +17,7 @@ finance_manager.create_new_category(
 )
 finance_manager.create_new_category(
     name='Тестовая категория расхода',
-    category_type=FinanceTransactionType.SPENDING
+    category_type=FinanceTransactionType.SPEND
 )
 
 
