@@ -1,18 +1,20 @@
 import asyncio
 import logging
+from typing import Callable, Any, Awaitable
 
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove
+from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove, Update
 from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
 
 import config
 from hustler_bracelet.bot.bot_dialogs.finance.add_category import add_finance_category_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_event_dialog
+from hustler_bracelet.finance.manager import FinanceManager
 from .bot_dialogs import states
 from .bot_dialogs.counter import counter_dialog
 from .bot_dialogs.layouts import layouts_dialog
@@ -83,11 +85,29 @@ def setup_dp():
     return dp
 
 
+async def database_middleware(
+        handler: Callable[[Update, dict[str, Any]], Awaitable[Any]],
+        event: Update,
+        data: dict[str, Any]
+) -> Any:
+    if event.message:
+        data['finance_manager'] = FinanceManager(event.message.from_user.id, event.message.from_user.first_name)
+    elif event.callback_query:
+        data['finance_manager'] = FinanceManager(event.callback_query.from_user.id, event.callback_query.from_user.first_name)
+    else:
+        print(f'Some strange event: {event}')
+
+    return await handler(event, data)
+
+
 async def main():
     # real main
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML)
     dp = setup_dp()
+
+    dp.update.outer_middleware.register(database_middleware)
+
     await dp.start_polling(bot)
 
 
