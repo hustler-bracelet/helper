@@ -1,3 +1,4 @@
-peewee
+peewee  # will soon be deleted!
+sqlmodel
 aiogram
 aiogram_dialog

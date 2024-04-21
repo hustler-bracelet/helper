@@ -1,15 +1,11 @@
-from peewee import *
+# -*- coding: utf-8 -*-
 
-from hustler_bracelet.database import UserTable
-from hustler_bracelet.database.engine import database_engine
-from hustler_bracelet.enums import FinanceEventType
+from .finance_transaction_type import FinanceTransactionType
+from sqlmodel import SQLModel, Field
 
 
-class CategoryTable(Model):
-    id = BigIntegerField(primary_key=True, unique=True, null=False)
-    name = TextField(null=False)
-    category_type: FinanceEventType = TextField(null=False)
-    user = ForeignKeyField(UserTable, backref='categories', null=False)
-
-    class Meta:
-        database = database_engine
+class Category(SQLModel, table=True):
+    uuid: str = Field(primary_key=True)
+    telegram_id: int = Field(foreign_key="user.telegram_id")
+    name: str
+    type: FinanceTransactionType

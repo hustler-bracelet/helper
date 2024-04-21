@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from peewee import SqliteDatabase
+from sqlmodel import create_engine, SQLModel
 
-database_engine = SqliteDatabase('hustler_bracelet.sqlite')
+
+DATABASE_ENGINE = create_engine('sqlite:///hustler_bracelet.sqlite')
+
+
+def create_all_tables() -> None:
+    return SQLModel.metadata.create_all(DATABASE_ENGINE)
