@@ -4,7 +4,7 @@ from typing import Sequence
 from uuid import uuid4 as create_uuid_v4
 
 from hustler_bracelet.database.engine import DATABASE_ENGINE
-from hustler_bracelet.database.exceptions import CategoryAlreadyExists
+from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError
 from hustler_bracelet.database.user import User
 from hustler_bracelet.database.category import Category
 from sqlmodel import Session, select
@@ -60,7 +60,7 @@ class FinanceManager:
                 )
             ).all()
             if categories_with_same_name:
-                raise CategoryAlreadyExists
+                raise CategoryAlreadyExistsError()
 
             # Create the category
             new_category = Category(
