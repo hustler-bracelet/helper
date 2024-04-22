@@ -13,7 +13,7 @@ from aiogram_dialog.api.exceptions import UnknownIntent
 
 import config
 from hustler_bracelet.bot.bot_dialogs.finance.add_category import add_finance_category_dialog
-from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_event_dialog
+from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_finance_event_dialog
 from hustler_bracelet.finance.manager import FinanceManager
 from .bot_dialogs import states
 from .bot_dialogs.counter import counter_dialog
@@ -62,7 +62,7 @@ dialog_router.include_routers(
     layouts_dialog,
     scroll_dialog,
     main_dialog,
-    add_event_dialog,
+    add_finance_event_dialog,
     add_finance_category_dialog,
     selects_dialog,
     counter_dialog,
