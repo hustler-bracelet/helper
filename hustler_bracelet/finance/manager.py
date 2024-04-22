@@ -3,15 +3,15 @@ from datetime import date, datetime
 from typing import Sequence, NoReturn
 from uuid import uuid4 as create_uuid_v4
 
+from sqlalchemy.sql.functions import func
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError
-from hustler_bracelet.database.user import User
-from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
-from sqlmodel import Session, select
-
+from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
 
 
@@ -66,6 +66,15 @@ class FinanceManager:
                 FinanceTransaction.type == category_type
             )
         )).all()
+        return query_results
+
+    async def get_events_amount(self, category_type: FinanceTransactionType) -> int:
+        query_results = (await self._session.exec(
+            select(func.count(FinanceTransaction.id)).where(
+                FinanceTransaction.telegram_id == self._telegram_id,
+                FinanceTransaction.type == category_type
+            )
+        )).one()
         return query_results
 
     async def create_new_category(self, name: str, category_type: FinanceTransactionType) -> Category:
