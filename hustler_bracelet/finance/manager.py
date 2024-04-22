@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import date, datetime
-from typing import Sequence
+from typing import Sequence, NoReturn
 from uuid import uuid4 as create_uuid_v4
 
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from hustler_bracelet.database.engine import DATABASE_ENGINE
-from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError
+from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError
 from hustler_bracelet.database.user import User
 from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
@@ -69,7 +69,7 @@ class FinanceManager:
         )).all()
         if categories_with_same_name:
             raise CategoryAlreadyExistsError()
-        
+
         # Create the category
         new_category = Category(
             uuid=str(create_uuid_v4()),
@@ -108,6 +108,14 @@ class FinanceManager:
         await self._session.commit()
 
         return
+
+    async def get_category_by_id(self, id_: str) -> Category | NoReturn:
+        category = (await self._session.exec(select(Category).where(Category.uuid == id_))).first()
+
+        if category is None:
+            raise CategoryNotFoundError()
+
+        return category
 
     async def __aenter__(self):
         return await self._session.__aenter__()
