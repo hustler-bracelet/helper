@@ -93,7 +93,6 @@ async def database_middleware(
     familiar_event: types.Message | types.CallbackQuery = event.message or event.callback_query
 
     if familiar_event:
-        print(type(familiar_event))
         data['finance_manager'] = finance_manager = FinanceManager(familiar_event.from_user.id)
 
         async with finance_manager:
