@@ -32,9 +32,8 @@ async def get_name_for_new_category(
         message.text,
         dialog_manager.start_data.get('cat_type') or dialog_manager.dialog_data['cat_type']
     )
-    print(new_category.uuid)
 
-    await dialog_manager.done(result={'category_id': new_category.uuid})
+    await dialog_manager.done(result={'category_id': await new_category.awaitable_attrs.uuid})
 
 
 add_finance_category_dialog = Dialog(
