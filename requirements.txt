@@ -1,4 +1,5 @@
 peewee  # will soon be deleted!
-sqlmodel
-aiogram
+sqlmodel~=0.0.16
+aiogram~=3.4.1
 aiogram_dialog
+SQLAlchemy~=2.0.29

@@ -7,6 +7,7 @@ from aiogram_dialog.widgets.text import Const, Format
 from hustler_bracelet.bot.bot_dialogs import states
 from hustler_bracelet.bot.lang_utils import finance_event_words_getter
 from hustler_bracelet.enums import FinanceTransactionType
+from hustler_bracelet.finance.manager import FinanceManager
 
 
 async def on_category_type_click(
@@ -25,9 +26,15 @@ async def get_name_for_new_category(
         dialog_manager: DialogManager,
         data: dict
 ):
-    # TODO: Тут надо создать новую категорию. Название для неё лежит в message.text, а тип в dialog_manager.start_data['cat_type]
+    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
-    await dialog_manager.done()
+    new_category = await finance_manager.create_new_category(
+        message.text,
+        dialog_manager.start_data.get('cat_type') or dialog_manager.dialog_data['cat_type']
+    )
+    print(new_category.uuid)
+
+    await dialog_manager.done(result={'category_id': new_category.uuid})
 
 
 add_finance_category_dialog = Dialog(

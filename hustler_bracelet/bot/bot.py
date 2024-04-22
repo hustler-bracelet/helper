@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Callable, Any, Awaitable
 
-from aiogram import Bot, Dispatcher, F, Router
+from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import ExceptionTypeFilter
@@ -90,14 +90,18 @@ async def database_middleware(
         event: Update,
         data: dict[str, Any]
 ) -> Any:
-    if event.message:
-        data['finance_manager'] = FinanceManager(event.message.from_user.id, event.message.from_user.first_name)
-    elif event.callback_query:
-        data['finance_manager'] = FinanceManager(event.callback_query.from_user.id, event.callback_query.from_user.first_name)
+    familiar_event: types.Message | types.CallbackQuery = event.message or event.callback_query
+
+    if familiar_event:
+        print(type(familiar_event))
+        data['finance_manager'] = finance_manager = FinanceManager(familiar_event.from_user.id)
+
+        async with finance_manager:
+            await finance_manager.create_user_if_not_exists(familiar_event.from_user.first_name)
+            return await handler(event, data)
     else:
         print(f'Some strange event: {event}')
-
-    return await handler(event, data)
+        return await handler(event, data)
 
 
 async def main():
