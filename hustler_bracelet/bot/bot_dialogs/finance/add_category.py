@@ -54,7 +54,7 @@ add_finance_category_dialog = Dialog(
         state=states.AddFinanceCategory.MAIN
     ),
     Window(
-        Format('Какое имя будет у новой категории {finance_event_name}?'),
+        Format('Какое имя будет у новой категории {finance_event_name}ов?'),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
         state=states.AddFinanceCategory.ENTER_NAME
     ),

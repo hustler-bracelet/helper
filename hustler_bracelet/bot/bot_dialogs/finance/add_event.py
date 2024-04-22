@@ -121,7 +121,7 @@ add_event_dialog = Dialog(
         Format(
             '{finance_event_emoji} <b>Добавление {finance_event_name}а</b>\n'
             '\n'
-            'Выбери категорию {finance_event_name}а или создай новую:'
+            'Выбери категорию {finance_event_name}ов или создай новую:'
         ),
         ScrollingGroup(
             Button(text=Const('Банки'), id=CategoryForNewEventCallback(category_id=0).pack(), on_click=on_choose_category_click),
