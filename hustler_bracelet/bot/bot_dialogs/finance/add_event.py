@@ -2,21 +2,22 @@ import datetime
 import operator
 from datetime import date
 
-from aiogram import types
+from aiogram import types, html
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
-    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select, Radio
+    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select
 )
 from aiogram_dialog.widgets.text import Const, Format
+from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.bot_dialogs import states
 from hustler_bracelet.bot.bot_dialogs.common import MAIN_MENU_BUTTON
-from hustler_bracelet.bot.callbacks import CategoryForNewEventCallback
 from hustler_bracelet.bot.lang_utils import finance_event_words_getter
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
-from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
+
+_evaluator = SimpleEval()
 
 
 async def on_date_clicked(
@@ -106,34 +107,25 @@ async def process_incorrect_amount_for_new_event(
         dialog_manager: DialogManager,
         error: ValueError,
 ):
-    await message.answer('\n'.join([error.args, 'Попробуй ещё раз']))
+    await message.answer('\n'.join([*map(html.quote, error.args), 'Попробуй ещё раз']))
 
 
 def validate_amount_for_new_event(text: str):
     amount = text.lower()
 
     replace_mapping = {
-        'к': 'k',
-        'r': 'k',
-        'л': 'k',
-
         ' ': '',
-
         ',': '.',
-        'б': '.',
-        'ю': '.',
-        '?': '.',
+        '^': '**',
+        ':': '/'
     }
     for old, new in replace_mapping.items():
         amount = amount.replace(old, new)
 
-    if 'k' in amount.rstrip('k'):
-        raise ValueError('Неправильный формат числа')
-
     try:
-        amount = float(amount.rstrip('k')) * (1000 ** amount.count('k'))
-    except ValueError:
-        raise ValueError('Неправильный формат числа')
+        amount = _evaluator.eval(amount)
+    except BaseException:
+        raise ValueError('Кажется, ты ввёл неправильную формулу')
 
     return amount
 
@@ -147,7 +139,7 @@ async def on_process_result(
     await dialog_manager.next()
 
 
-add_event_dialog = Dialog(
+add_finance_event_dialog = Dialog(
     Window(
         Format(
             '{finance_event_emoji} <b>Добавление {finance_event_name}а</b>\n'
