@@ -52,8 +52,18 @@ class FinanceManager:
     async def get_all_categories(self, category_type: FinanceTransactionType) -> Sequence[Category]:
         query_results = (await self._session.exec(
             select(Category).where(
-                Category.telegram_id == self._telegram_id
-                and Category.type == category_type
+                Category.telegram_id == self._telegram_id,
+                Category.type == category_type
+            )
+        )).all()
+        print(category_type)
+        return query_results
+
+    async def get_all_events(self, category_type: FinanceTransactionType) -> Sequence[FinanceTransaction]:
+        query_results = (await self._session.exec(
+            select(FinanceTransaction).where(
+                FinanceTransaction.telegram_id == self._telegram_id,
+                FinanceTransaction.type == category_type
             )
         )).all()
         return query_results
@@ -62,9 +72,9 @@ class FinanceManager:
         # Check if this user already has categories with the same name and type
         categories_with_same_name = (await self._session.exec(
             select(Category).where(
-                Category.name == name
-                and Category.telegram_id == self._telegram_id
-                and Category.type == category_type
+                Category.name == name,
+                Category.telegram_id == self._telegram_id,
+                Category.type == category_type
             )
         )).all()
         if categories_with_same_name:
@@ -72,7 +82,6 @@ class FinanceManager:
 
         # Create the category
         new_category = Category(
-            uuid=str(create_uuid_v4()),
             telegram_id=self._telegram_id,
             name=name,
             type=category_type
@@ -86,14 +95,14 @@ class FinanceManager:
         await self._session.delete(category_to_delete)
         await self._session.commit()
 
-    async def add_income(self, category: Category, value: int | float, transaction_date: date = date.today()):
+    async def add_finance_transaction(self, category: Category, value: int | float, transaction_date: date = date.today()):
         value = float(value)
 
         finance_transaction = FinanceTransaction(
-            uuid=str(create_uuid_v4()),
+            id=str(create_uuid_v4()),
             telegram_id=self._telegram_id,
-            type=FinanceTransactionType.INCOME,
-            category=category.uuid,
+            type=category.type,
+            category=category.id,
             value=value,
             added_on=datetime.now(),
             transaction_date=transaction_date
@@ -110,7 +119,7 @@ class FinanceManager:
         return
 
     async def get_category_by_id(self, id_: str) -> Category | NoReturn:
-        category = (await self._session.exec(select(Category).where(Category.uuid == id_))).first()
+        category = (await self._session.exec(select(Category).where(Category.id == id_))).first()
 
         if category is None:
             raise CategoryNotFoundError()
