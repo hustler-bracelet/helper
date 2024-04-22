@@ -1,31 +1,44 @@
 import datetime
-import re
 from datetime import date
 
-from aiogram import types, Dispatcher
-from aiogram.types import ForceReply
+from aiogram import types
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
-    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, Start, CalendarConfig
+    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig
 )
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.bot_dialogs import states
 from hustler_bracelet.bot.bot_dialogs.common import MAIN_MENU_BUTTON
 from hustler_bracelet.bot.callbacks import CategoryForNewEventCallback
-from hustler_bracelet.bot.lang_utils import get_finance_event_type_verb, finance_event_words_getter
-from hustler_bracelet.enums import FinanceTransactionType
+from hustler_bracelet.bot.lang_utils import finance_event_words_getter
+from hustler_bracelet.database.exceptions import CategoryNotFoundError
+from hustler_bracelet.finance.manager import FinanceManager
 
 
 async def on_date_clicked(
         callback: ChatEvent,
         widget: ManagedCalendar | None,
         manager: DialogManager,
-        selected_date: date,
+        selected_date: date
 ):
     await callback.answer(str(selected_date))
-    manager.dialog_data['event_date'] = selected_date
+    finance_manager: FinanceManager = manager.middleware_data['finance_manager']
+
+    manager.dialog_data['event_date'] = selected_date  # Пригодится при форматировании финального сообщения
+
+    try:
+        category = await finance_manager.get_category_by_id(manager.dialog_data['category_id'])
+    except CategoryNotFoundError:
+        return  # TODO: Добавить реакцию на CategoryNotFoundError
+
+    await finance_manager.add_income(
+        category,
+        manager.dialog_data['value'],
+        selected_date
+    )
+
     await manager.next()
 
 
@@ -59,7 +72,6 @@ async def on_choose_category_click(
         manager: DialogManager,
 ):
     manager.dialog_data['category_id'] = CategoryForNewEventCallback.unpack(value=callback.data).category_id
-    # event_date = manager.dialog_data['event_date']
 
     await manager.next()
 
@@ -112,8 +124,13 @@ def validate_amount_for_new_event(text: str):
     return amount
 
 
-# async def data_getter_for_final_window(dialog_manager: DialogManager, **kwargs):
-#     return {**dialog_manager.dialog_data, **dialog_manager.start_data}
+async def on_process_result(
+        start_data: dict,
+        result_data: dict,
+        dialog_manager: DialogManager
+):
+    dialog_manager.dialog_data['category_id'] = result_data['category_id']
+    await dialog_manager.next()
 
 
 add_event_dialog = Dialog(
@@ -181,4 +198,5 @@ add_event_dialog = Dialog(
         state=states.AddFinanceEvent.FINAL
     ),
     getter=finance_event_words_getter,
+    on_process_result=on_process_result
 )
