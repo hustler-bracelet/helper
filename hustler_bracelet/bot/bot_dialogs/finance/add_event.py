@@ -1,11 +1,12 @@
 import datetime
+import operator
 from datetime import date
 
 from aiogram import types
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
-    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig
+    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select, Radio
 )
 from aiogram_dialog.widgets.text import Const, Format
 
@@ -14,6 +15,7 @@ from hustler_bracelet.bot.bot_dialogs.common import MAIN_MENU_BUTTON
 from hustler_bracelet.bot.callbacks import CategoryForNewEventCallback
 from hustler_bracelet.bot.lang_utils import finance_event_words_getter
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
+from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
 
 
@@ -33,7 +35,7 @@ async def on_date_clicked(
     except CategoryNotFoundError:
         return  # TODO: Добавить реакцию на CategoryNotFoundError
 
-    await finance_manager.add_income(
+    await finance_manager.add_finance_transaction(
         category,
         manager.dialog_data['value'],
         selected_date
@@ -70,10 +72,22 @@ async def on_choose_category_click(
         callback: types.CallbackQuery,
         button: Button,
         manager: DialogManager,
+        data
 ):
-    manager.dialog_data['category_id'] = CategoryForNewEventCallback.unpack(value=callback.data).category_id
+    print(dict)
+    # manager.dialog_data['category_id'] = CategoryForNewEventCallback.unpack(value=callback.data).category_id
 
     await manager.next()
+
+
+async def category_choose_window_getter(dialog_manager: DialogManager, **kwargs):
+    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
+    categories = await finance_manager.get_all_categories(dialog_manager.start_data['event_type'])
+    print(categories)
+
+    return {
+        'categories': [(category.name, category.id) for category in categories]
+    }
 
 
 async def get_amount_for_new_event(
@@ -141,9 +155,14 @@ add_event_dialog = Dialog(
             'Выбери категорию {finance_event_name}ов или создай новую:'
         ),
         ScrollingGroup(
-            Button(text=Const('Банки'), id=CategoryForNewEventCallback(category_id=0).pack(), on_click=on_choose_category_click),
-            Button(text=Const('Хуянки'), id=CategoryForNewEventCallback(category_id=1).pack(), on_click=on_choose_category_click),
-            id="fin_category",
+            Select(
+                Format('{item[0]}'),
+                id='select_categories_for_new_event',
+                item_id_getter=operator.itemgetter(1),
+                items='categories',
+                on_click=on_choose_category_click
+            ),
+            id="scroll_categories_for_new_event",
             width=1,
             height=6,
             hide_on_single_page=True
@@ -151,6 +170,7 @@ add_event_dialog = Dialog(
         Button(text=Const('➕ Создать новую категорию'), id='add_fin_category', on_click=on_add_category_click),
         MAIN_MENU_BUTTON,
         state=states.AddFinanceEvent.MAIN,
+        getter=category_choose_window_getter
     ),
     Window(
         Format(
