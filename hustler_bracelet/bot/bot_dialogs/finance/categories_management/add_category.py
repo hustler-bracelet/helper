@@ -73,7 +73,7 @@ add_finance_category_dialog = Dialog(
     ),
     Window(
         Format('Категория успешно добавлена'),
-        Button(Const('Вернуться'), on_click=on_cancel_click, id='on_cancel_id_while_category_created'),
+        Button(Const('Ok'), on_click=on_cancel_click, id='on_cancel_id_while_category_created'),
         state=states.AddFinanceCategory.FINAL
     ),
 

@@ -61,6 +61,38 @@ class AddFinanceCategory(StatesGroup):
     FINAL = State()
 
 
+class DeleteFinanceCategory(StatesGroup):
+    MAIN = State()
+
+
+class TaskTracking(StatesGroup):
+    MAIN = State()
+
+
+class AddTask(StatesGroup):
+    MAIN = State()
+
+
+class Sport(StatesGroup):
+    MAIN = State()
+
+
+class SettingsMainMenu(StatesGroup):
+    MAIN = State()
+
+
+class ChangeCurrencySetting(StatesGroup):
+    MAIN = State()
+
+
+class AboutBot(StatesGroup):
+    MAIN = State()
+
+
+class EraseAllDataAboutUser(StatesGroup):
+    MAIN = State()
+
+
 class Counter(StatesGroup):
     MAIN = State()
 

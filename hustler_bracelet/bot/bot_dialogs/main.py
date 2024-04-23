@@ -82,6 +82,11 @@ main_dialog = Dialog(
                 state=states.Sport.MAIN
             )
         ),
+        Start(
+            text=Const('⚙️ Настройки'),
+            id='setting_menu',
+            state=states.SettingsMainMenu.MAIN
+        ),
         # Start(
         #     text=Const("💯 Counter and Progress"),
         #     id="counter",

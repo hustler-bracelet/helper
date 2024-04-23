@@ -209,7 +209,7 @@ add_finance_event_dialog = Dialog(
             '\n'
             '✅ {capitalized_finance_event_name} {dialog_data[value]} за {dialog_data[event_date]} успешно зарегистрирован.'  # TODO: Сделать красивый рендеринг для event_date и value
         ),
-        Cancel(Const('Обратно')),
+        Cancel(Const('Ok')),
         state=states.AddFinanceEvent.FINAL
     ),
     getter=finance_event_words_getter,

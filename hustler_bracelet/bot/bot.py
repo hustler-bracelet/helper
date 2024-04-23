@@ -16,6 +16,8 @@ from hustler_bracelet.bot.bot_dialogs.finance import finance_menu_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_finance_event_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.categories_management import finance_categories_management_menu_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.categories_management.add_category import add_finance_category_dialog
+from hustler_bracelet.bot.bot_dialogs.setting import settings_main_menu_dialog
+from hustler_bracelet.bot.bot_dialogs.setting.about_bot import about_bot_dialog
 from hustler_bracelet.finance.manager import FinanceManager
 from .bot_dialogs import states
 from .bot_dialogs.counter import counter_dialog
@@ -62,6 +64,8 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 dialog_router = Router()
 dialog_router.include_routers(
     main_dialog,
+    settings_main_menu_dialog,
+    about_bot_dialog,
     layouts_dialog,
     scroll_dialog,
     finance_menu_dialog,
@@ -110,7 +114,7 @@ async def database_middleware(
 async def main():
     # real main
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML)
+    bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     dp = setup_dp()
 
     dp.update.outer_middleware.register(database_middleware)
