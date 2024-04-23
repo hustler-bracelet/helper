@@ -121,7 +121,10 @@ class FinanceManager:
         user = (await self._session.exec(
             select(User).where(User.telegram_id == self._telegram_id)
         )).first()
-        user.current_balance += value
+        if category.type is FinanceTransactionType.INCOME:
+            user.current_balance += value
+        else:
+            user.current_balance -= value
 
         await self._session.commit()
 
