@@ -16,8 +16,9 @@ from hustler_bracelet.bot.bot_dialogs.finance import finance_menu_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_finance_event_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.categories_management import finance_categories_management_menu_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.categories_management.add_category import add_finance_category_dialog
-from hustler_bracelet.bot.bot_dialogs.setting import settings_main_menu_dialog
-from hustler_bracelet.bot.bot_dialogs.setting.about_bot import about_bot_dialog
+from hustler_bracelet.bot.bot_dialogs.settings import settings_main_menu_dialog
+from hustler_bracelet.bot.bot_dialogs.settings.about_bot import about_bot_dialog
+from hustler_bracelet.bot.bot_dialogs.sport import sport_main_menu_dialog
 from hustler_bracelet.finance.manager import FinanceManager
 from .bot_dialogs import states
 from .bot_dialogs.counter import counter_dialog
