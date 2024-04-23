@@ -33,7 +33,20 @@ async def get_name_for_new_category(
         dialog_manager.start_data.get('cat_type') or dialog_manager.dialog_data['cat_type']
     )
 
-    await dialog_manager.done(result={'category_id': await new_category.awaitable_attrs.id})
+    if dialog_manager.start_data.get('force_done'):
+        await dialog_manager.done(result={'category_id': await new_category.awaitable_attrs.id})
+        return
+
+    dialog_manager.dialog_data['category_id'] = await new_category.awaitable_attrs.id
+    await dialog_manager.next()
+
+
+async def on_cancel_click(
+        callback: types.CallbackQuery,
+        button: Button,
+        dialog_manager: DialogManager,
+):
+    await dialog_manager.done(result={'category_id': dialog_manager.dialog_data['category_id']})
 
 
 add_finance_category_dialog = Dialog(
@@ -58,5 +71,11 @@ add_finance_category_dialog = Dialog(
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
         state=states.AddFinanceCategory.ENTER_NAME
     ),
+    Window(
+        Format('Категория успешно добавлена'),
+        Button(Const('Вернуться'), on_click=on_cancel_click, id='on_cancel_id_while_category_created'),
+        state=states.AddFinanceCategory.FINAL
+    ),
+
     getter=finance_event_words_getter,
 )

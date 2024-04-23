@@ -36,6 +36,18 @@ class Calendar(StatesGroup):
     CUSTOM = State()
 
 
+class FinanceMainMenu(StatesGroup):
+    MAIN = State()
+
+
+class FinanceCategoriesManagementMenu(StatesGroup):
+    MAIN = State()
+
+
+class FinanceInvestmentsMenu(StatesGroup):
+    MAIN = State()
+
+
 class AddFinanceEvent(StatesGroup):
     MAIN = State()
     ENTER_VALUE = State()

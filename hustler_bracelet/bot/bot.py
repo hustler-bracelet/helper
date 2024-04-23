@@ -12,8 +12,10 @@ from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
 
 import config
-from hustler_bracelet.bot.bot_dialogs.finance.add_category import add_finance_category_dialog
+from hustler_bracelet.bot.bot_dialogs.finance import finance_menu_dialog
 from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_finance_event_dialog
+from hustler_bracelet.bot.bot_dialogs.finance.categories_management import finance_categories_management_menu_dialog
+from hustler_bracelet.bot.bot_dialogs.finance.categories_management.add_category import add_finance_category_dialog
 from hustler_bracelet.finance.manager import FinanceManager
 from .bot_dialogs import states
 from .bot_dialogs.counter import counter_dialog
@@ -59,9 +61,11 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 
 dialog_router = Router()
 dialog_router.include_routers(
+    main_dialog,
     layouts_dialog,
     scroll_dialog,
-    main_dialog,
+    finance_menu_dialog,
+    finance_categories_management_menu_dialog,
     add_finance_event_dialog,
     add_finance_category_dialog,
     selects_dialog,

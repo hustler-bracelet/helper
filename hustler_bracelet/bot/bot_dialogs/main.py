@@ -1,6 +1,5 @@
 from aiogram_dialog import Dialog, LaunchMode, Window, DialogManager
-from aiogram_dialog.about import about_aiogram_dialog_button
-from aiogram_dialog.widgets.kbd import Start
+from aiogram_dialog.widgets.kbd import Start, Row
 from aiogram_dialog.widgets.text import Const, Format
 
 from . import states
@@ -63,9 +62,25 @@ main_dialog = Dialog(
         ),
         Start(
             text=Const("📝 Добавить задачу"),
-            id="add_spend",
-            state=states.AddFinanceEvent.MAIN,
-            data={'event_type': FinanceTransactionType.SPENDING}
+            id="add_task",
+            state=states.AddTask.MAIN
+        ),
+        Row(
+            Start(
+                text=Const('💸 Финансы'),
+                id='finance_control_menu',
+                state=states.FinanceMainMenu.MAIN
+            ),
+            Start(
+                text=Const('✅ Планирование'),
+                id='tasktracking_menu',
+                state=states.TaskTracking.MAIN
+            ),
+            Start(
+                text=Const('💪 Спорт'),
+                id='sport_menu',
+                state=states.Sport.MAIN
+            )
         ),
         # Start(
         #     text=Const("💯 Counter and Progress"),

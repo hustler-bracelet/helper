@@ -6,13 +6,12 @@ from aiogram import types, html
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
-    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select
+    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select, Cancel
 )
 from aiogram_dialog.widgets.text import Const, Format
 from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.bot_dialogs import states
-from hustler_bracelet.bot.bot_dialogs.common import MAIN_MENU_BUTTON
 from hustler_bracelet.bot.lang_utils import finance_event_words_getter
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
 from hustler_bracelet.finance.manager import FinanceManager
@@ -65,7 +64,10 @@ async def on_add_category_click(
 ):
     await manager.start(
         state=states.AddFinanceCategory.ENTER_NAME,  # Скипаем первый этап, т.к. ответ на первый вопрос (тип категории) уже известен
-        data={'cat_type': manager.start_data['event_type']}
+        data={
+            'cat_type': manager.start_data['event_type'],
+            'force_done': True
+        }
     )
 
 
@@ -160,7 +162,7 @@ add_finance_event_dialog = Dialog(
             hide_on_single_page=True
         ),
         Button(text=Const('➕ Создать новую категорию'), id='add_fin_category', on_click=on_add_category_click),
-        MAIN_MENU_BUTTON,
+        Cancel(),
         state=states.AddFinanceEvent.MAIN,
         getter=category_choose_window_getter
     ),
@@ -207,6 +209,7 @@ add_finance_event_dialog = Dialog(
             '\n'
             '✅ {capitalized_finance_event_name} {dialog_data[value]} за {dialog_data[event_date]} успешно зарегистрирован.'  # TODO: Сделать красивый рендеринг для event_date и value
         ),
+        Cancel(Const('Обратно')),
         state=states.AddFinanceEvent.FINAL
     ),
     getter=finance_event_words_getter,
