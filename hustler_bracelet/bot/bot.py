@@ -65,6 +65,7 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 dialog_router = Router()
 dialog_router.include_routers(
     main_dialog,
+    sport_main_menu_dialog,
     settings_main_menu_dialog,
     about_bot_dialog,
     layouts_dialog,
