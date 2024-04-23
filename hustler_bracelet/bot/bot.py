@@ -19,6 +19,9 @@ from hustler_bracelet.bot.bot_dialogs.finance.categories_management.add_category
 from hustler_bracelet.bot.bot_dialogs.settings import settings_main_menu_dialog
 from hustler_bracelet.bot.bot_dialogs.settings.about_bot import about_bot_dialog
 from hustler_bracelet.bot.bot_dialogs.sport import sport_main_menu_dialog
+from hustler_bracelet.bot.bot_dialogs.task_tracking import task_tracking_main_menu_dialog
+from hustler_bracelet.bot.bot_dialogs.task_tracking.add_task import add_task_dialog
+from hustler_bracelet.bot.bot_dialogs.task_tracking.complete_some_tasks import complete_some_tasks_dialog
 from hustler_bracelet.finance.manager import FinanceManager
 from .bot_dialogs import states
 from .bot_dialogs.counter import counter_dialog
@@ -66,6 +69,9 @@ dialog_router = Router()
 dialog_router.include_routers(
     main_dialog,
     sport_main_menu_dialog,
+    task_tracking_main_menu_dialog,
+    add_task_dialog,
+    complete_some_tasks_dialog,
     settings_main_menu_dialog,
     about_bot_dialog,
     layouts_dialog,

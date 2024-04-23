@@ -71,6 +71,12 @@ class TaskTracking(StatesGroup):
 
 class AddTask(StatesGroup):
     MAIN = State()
+    GET_DATE = State()
+    FINAL = State()
+
+
+class CompleteSomeTasks(StatesGroup):
+    MAIN = State()
 
 
 class Sport(StatesGroup):
