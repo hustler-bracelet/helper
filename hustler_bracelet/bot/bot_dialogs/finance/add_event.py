@@ -1,8 +1,10 @@
 import datetime
 import operator
 from datetime import date
+from typing import Any
 
 from aiogram import types, html
+from aiogram.types import CallbackQuery
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
@@ -13,6 +15,7 @@ from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.bot_dialogs import states
 from hustler_bracelet.bot.lang_utils import finance_event_words_getter
+from hustler_bracelet.bot.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
 from hustler_bracelet.finance.manager import FinanceManager
 
@@ -44,19 +47,6 @@ async def on_date_clicked(
     await manager.next()
 
 
-async def on_today_clicked(
-        callback: ChatEvent,
-        button: Button,
-        manager: DialogManager,
-):
-    return await on_date_clicked(
-        callback=callback,
-        widget=None,
-        manager=manager,
-        selected_date=date.today()
-    )
-
-
 async def on_add_category_click(
         callback: types.CallbackQuery,
         button: Button,
@@ -72,13 +62,12 @@ async def on_add_category_click(
 
 
 async def on_choose_category_click(
-        callback: types.CallbackQuery,
-        button: Button,
+        callback: CallbackQuery,
+        widget: Any,
         manager: DialogManager,
-        data
+        item_id: int
 ):
-    print(dict)
-    # manager.dialog_data['category_id'] = CategoryForNewEventCallback.unpack(value=callback.data).category_id
+    manager.dialog_data['category_id'] = item_id
 
     await manager.next()
 
@@ -93,7 +82,7 @@ async def category_choose_window_getter(dialog_manager: DialogManager, **kwargs)
     }
 
 
-async def get_amount_for_new_event(
+async def on_amount_for_new_event_entered(
         message: types.Message,
         widget: ManagedTextInput,
         dialog_manager: DialogManager,
@@ -174,7 +163,7 @@ add_finance_event_dialog = Dialog(
         ),
         TextInput(
             id='amount_of_new_event',
-            on_success=get_amount_for_new_event,
+            on_success=on_amount_for_new_event_entered,
             on_error=process_incorrect_amount_for_new_event,
             type_factory=validate_amount_for_new_event
         ),
@@ -194,11 +183,7 @@ add_finance_event_dialog = Dialog(
                 max_date=datetime.date.today()
             )
         ),
-        Button(
-            id='fin_today',
-            text=Const('Сегодня'),
-            on_click=on_today_clicked,
-        ),
+        Today(on_date_clicked),
         Back(),
 
         state=states.AddFinanceEvent.CHOOSE_DATE,
