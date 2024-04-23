@@ -49,20 +49,20 @@ main_dialog = Dialog(
         #     state=states.Selects.MAIN,
         # ),
         Start(
-            text=Const("🤑 Добавить доход"),
-            id="add_income",
+            text=Const('🤑 Добавить доход'),
+            id='add_income',
             state=states.AddFinanceEvent.MAIN,
             data={'event_type': FinanceTransactionType.INCOME}
         ),
         Start(
-            text=Const("💳 Добавить расход"),
-            id="add_spend",
+            text=Const('💳 Добавить расход'),
+            id='add_spend',
             state=states.AddFinanceEvent.MAIN,
             data={'event_type': FinanceTransactionType.SPENDING}
         ),
         Start(
-            text=Const("📝 Добавить задачу"),
-            id="add_task",
+            text=Const('📝 Добавить задачу'),
+            id='add_task',
             state=states.AddTask.MAIN
         ),
         Row(
@@ -73,7 +73,7 @@ main_dialog = Dialog(
             ),
             Start(
                 text=Const('✅ Планирование'),
-                id='tasktracking_menu',
+                id='task_tracking_menu',
                 state=states.TaskTracking.MAIN
             ),
             Start(
