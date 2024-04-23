@@ -5,7 +5,8 @@ from aiogram_dialog.widgets.kbd import Row, Button
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.bot_dialogs import states
-from hustler_bracelet.bot.lang_utils import finance_event_words_getter
+from hustler_bracelet.bot.utils import get_event_type
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
 
@@ -30,10 +31,10 @@ async def get_name_for_new_category(
 
     new_category = await finance_manager.create_new_category(
         message.text,
-        dialog_manager.start_data.get('cat_type') or dialog_manager.dialog_data['cat_type']
+        get_event_type(dialog_manager)
     )
 
-    if dialog_manager.start_data.get('force_done'):
+    if dialog_manager.start_data and dialog_manager.start_data.get('force_done'):
         await dialog_manager.done(result={'category_id': await new_category.awaitable_attrs.id})
         return
 
@@ -60,7 +61,7 @@ add_finance_category_dialog = Dialog(
             ),
             Button(
                 text=Const('Расходы'),
-                id='cat_type_spend',
+                id='cat_type_spending',
                 on_click=on_category_type_click
             )
         ),
@@ -69,13 +70,12 @@ add_finance_category_dialog = Dialog(
     Window(
         Format('Какое имя будет у новой категории {finance_event_name}ов?'),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
-        state=states.AddFinanceCategory.ENTER_NAME
+        state=states.AddFinanceCategory.ENTER_NAME,
+        getter=finance_event_words_getter,
     ),
     Window(
         Format('Категория успешно добавлена'),
         Button(Const('Ok'), on_click=on_cancel_click, id='on_cancel_id_while_category_created'),
         state=states.AddFinanceCategory.FINAL
     ),
-
-    getter=finance_event_words_getter,
 )
