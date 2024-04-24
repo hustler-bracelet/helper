@@ -2,7 +2,7 @@ from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.kbd import Row, Start, Cancel, Back
 from aiogram_dialog.widgets.text import Const
 
-from hustler_bracelet.bot.bot_dialogs import states
+from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.enums import FinanceTransactionType
 
 finance_categories_management_menu_dialog = Dialog(

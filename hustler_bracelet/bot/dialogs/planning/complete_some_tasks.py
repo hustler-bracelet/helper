@@ -5,7 +5,7 @@ from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Row, Cancel, Button, Multiselect, Column, ScrollingGroup
 from aiogram_dialog.widgets.text import Const, Format
 
-from hustler_bracelet.bot.bot_dialogs import states
+from hustler_bracelet.bot.dialogs import states
 
 
 async def get_tasks(**kwargs):

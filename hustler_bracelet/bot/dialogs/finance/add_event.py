@@ -13,7 +13,7 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Const, Format
 from simpleeval import SimpleEval
 
-from hustler_bracelet.bot.bot_dialogs import states
+from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
 from hustler_bracelet.bot.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError

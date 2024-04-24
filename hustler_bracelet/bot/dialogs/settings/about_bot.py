@@ -4,7 +4,7 @@ from aiogram_dialog.about import about_aiogram_dialog_button
 from aiogram_dialog.widgets.kbd import Cancel
 from aiogram_dialog.widgets.text import Const
 
-from hustler_bracelet.bot.bot_dialogs import states
+from hustler_bracelet.bot.dialogs import states
 
 about_bot_dialog = Dialog(
     Window(

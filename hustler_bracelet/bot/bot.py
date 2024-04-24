@@ -12,26 +12,26 @@ from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
 
 import config
-from hustler_bracelet.bot.bot_dialogs.finance import finance_menu_dialog
-from hustler_bracelet.bot.bot_dialogs.finance.add_event import add_finance_event_dialog
-from hustler_bracelet.bot.bot_dialogs.finance.categories_management import finance_categories_management_menu_dialog
-from hustler_bracelet.bot.bot_dialogs.finance.categories_management.add_category import add_finance_category_dialog
-from hustler_bracelet.bot.bot_dialogs.settings import settings_main_menu_dialog
-from hustler_bracelet.bot.bot_dialogs.settings.about_bot import about_bot_dialog
-from hustler_bracelet.bot.bot_dialogs.sport import sport_main_menu_dialog
-from hustler_bracelet.bot.bot_dialogs.planning import planning_main_menu_dialog
-from hustler_bracelet.bot.bot_dialogs.planning.add_task import add_task_dialog
-from hustler_bracelet.bot.bot_dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
+from hustler_bracelet.bot.dialogs.finance import finance_menu_dialog
+from hustler_bracelet.bot.dialogs.finance.add_event import add_finance_event_dialog
+from hustler_bracelet.bot.dialogs.finance.categories_management import finance_categories_management_menu_dialog
+from hustler_bracelet.bot.dialogs.finance.categories_management.add_category import add_finance_category_dialog
+from hustler_bracelet.bot.dialogs.settings import settings_main_menu_dialog
+from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
+from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
+from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
+from hustler_bracelet.bot.dialogs.planning.add_task import add_task_dialog
+from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
 from hustler_bracelet.finance.manager import FinanceManager
-from .bot_dialogs import states
-from .bot_dialogs.counter import counter_dialog
-from .bot_dialogs.layouts import layouts_dialog
-from .bot_dialogs.main import main_dialog
-from .bot_dialogs.mutltiwidget import multiwidget_dialog
-from .bot_dialogs.reply_buttons import reply_kbd_dialog
-from .bot_dialogs.scrolls import scroll_dialog
-from .bot_dialogs.select import selects_dialog
-from .bot_dialogs.switch import switch_dialog
+from .dialogs import states
+from .dialogs.counter import counter_dialog
+from .dialogs.layouts import layouts_dialog
+from .dialogs.main import main_dialog
+from .dialogs.mutltiwidget import multiwidget_dialog
+from .dialogs.reply_buttons import reply_kbd_dialog
+from .dialogs.scrolls import scroll_dialog
+from .dialogs.select import selects_dialog
+from .dialogs.switch import switch_dialog
 
 
 async def start(message: Message, dialog_manager: DialogManager):

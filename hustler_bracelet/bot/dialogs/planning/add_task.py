@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Cancel, Calendar, ManagedCalendar, CalendarConfig, Back
 from aiogram_dialog.widgets.text import Const, Format
 
-from hustler_bracelet.bot.bot_dialogs import states
+from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.widgets import Today
 
 

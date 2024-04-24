@@ -2,7 +2,7 @@ from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.kbd import Start, Cancel
 from aiogram_dialog.widgets.text import Const
 
-from hustler_bracelet.bot.bot_dialogs import states
+from hustler_bracelet.bot.dialogs import states
 
 settings_main_menu_dialog = Dialog(
     Window(
