@@ -99,6 +99,10 @@ class EraseAllDataAboutUser(StatesGroup):
     MAIN = State()
 
 
+class OnBoarding(StatesGroup):
+    MAIN = State()
+
+
 class Counter(StatesGroup):
     MAIN = State()
 

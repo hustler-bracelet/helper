@@ -87,6 +87,11 @@ main_dialog = Dialog(
             id='setting_menu',
             state=states.SettingsMainMenu.MAIN
         ),
+        Start(
+            text=Const('🔒 Онбординг'),
+            id='onboarding_menu',
+            state=states.OnBoarding.MAIN
+        ),
         # Start(
         #     text=Const("💯 Counter and Progress"),
         #     id="counter",
