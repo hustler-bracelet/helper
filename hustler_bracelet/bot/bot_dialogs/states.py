@@ -65,7 +65,7 @@ class DeleteFinanceCategory(StatesGroup):
     MAIN = State()
 
 
-class TaskTracking(StatesGroup):
+class Planning(StatesGroup):
     MAIN = State()
 
 

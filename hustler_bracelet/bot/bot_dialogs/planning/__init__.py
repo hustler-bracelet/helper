@@ -4,7 +4,7 @@ from aiogram_dialog.widgets.text import Const
 
 from hustler_bracelet.bot.bot_dialogs import states
 
-task_tracking_main_menu_dialog = Dialog(
+planning_main_menu_dialog = Dialog(
     Window(
         Const(
             '✅ Планирование\n'
@@ -34,6 +34,6 @@ task_tracking_main_menu_dialog = Dialog(
             state=states.CompleteSomeTasks.MAIN
         ),
         Cancel(),
-        state=states.TaskTracking.MAIN
+        state=states.Planning.MAIN
     )
 )

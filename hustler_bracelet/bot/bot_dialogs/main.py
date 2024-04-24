@@ -73,8 +73,8 @@ main_dialog = Dialog(
             ),
             Start(
                 text=Const('✅ Планирование'),
-                id='task_tracking_menu',
-                state=states.TaskTracking.MAIN
+                id='planning_menu',
+                state=states.Planning.MAIN
             ),
             Start(
                 text=Const('💪 Спорт'),
