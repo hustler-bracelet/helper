@@ -4,3 +4,4 @@ aiogram~=3.4.1
 aiogram_dialog
 SQLAlchemy~=2.0.29
 simpleeval~=0.9.13
+aiosqlite
