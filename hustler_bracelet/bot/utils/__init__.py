@@ -11,7 +11,7 @@ def get_event_type(dialog_manager: DialogManager) -> FinanceTransactionType:
 
     if dialog_manager.dialog_data:
         event_type = dialog_manager.dialog_data.get('cat_type') or dialog_manager.dialog_data.get('event_type')
-    elif dialog_manager.start_data:
+    if dialog_manager.start_data:
         event_type = dialog_manager.start_data.get('cat_type') or dialog_manager.start_data.get('event_type')
 
     if event_type is None:
