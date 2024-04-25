@@ -77,6 +77,15 @@ class FinanceManager:
         )).one()
         return query_results
 
+    async def get_categories_amount(self, category_type: FinanceTransactionType) -> int:
+        query_results = (await self._session.exec(
+            select(func.count(Category.id)).where(
+                Category.telegram_id == self._telegram_id,
+                Category.type == category_type
+            )
+        )).one()
+        return query_results
+
     async def create_new_category(self, name: str, category_type: FinanceTransactionType) -> Category:
         # Check if this user already has categories with the same name and type
         categories_with_same_name = (await self._session.exec(
