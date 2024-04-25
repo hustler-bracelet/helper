@@ -52,7 +52,11 @@ async def on_cancel_click(
 
 add_finance_category_dialog = Dialog(
     Window(
-        Const('Какой тип будет иметь новая категория?'),
+        Const(
+            '➕ <b>Добавление категории</b>\n'
+            '\n'
+            'Какой тип будет иметь новая категория?'
+        ),
         Row(
             Button(
                 text=Const('Доходы'),
@@ -68,14 +72,27 @@ add_finance_category_dialog = Dialog(
         state=states.AddFinanceCategory.MAIN
     ),
     Window(
-        Format('Какое имя будет у новой категории {finance_event_name}ов?'),
+        Format(
+            '➕ <b>Добавление категории {finance_event_name}ов</b>\n'
+            '\n'
+            'Какое имя будет у новой категории {finance_event_name}ов?'
+        ),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
         state=states.AddFinanceCategory.ENTER_NAME,
         getter=finance_event_words_getter,
     ),
     Window(
-        Format('Категория успешно добавлена'),
-        Button(Const('Ok'), on_click=on_cancel_click, id='on_cancel_id_while_category_created'),
-        state=states.AddFinanceCategory.FINAL
+        Format(
+            '➕ <b>Добавление категории {finance_event_name}ов</b>\n'
+            '\n'
+            'Категория успешно добавлена'
+        ),
+        Button(
+            Const('Ok'),
+            on_click=on_cancel_click,
+            id='on_cancel_id_while_category_created'
+        ),
+        state=states.AddFinanceCategory.FINAL,
+        getter=finance_event_words_getter,
     ),
 )
