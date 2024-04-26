@@ -56,6 +56,7 @@ class AddFinanceEvent(StatesGroup):
 
 
 class AddFinanceCategory(StatesGroup):
+    ENTER_NAME_FROM_EVENT_ADDING = State()
     MAIN = State()
     ENTER_NAME = State()
     FINAL = State()

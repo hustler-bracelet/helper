@@ -1,8 +1,9 @@
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Row, Start, Cancel
+from aiogram_dialog.widgets.kbd import Row, Start, Cancel, Button
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.dialogs.finance.add_event import on_start_add_event_dialog_click
 from hustler_bracelet.bot.utils.lang_utils import formatted_balance_getter
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
@@ -36,17 +37,15 @@ finance_menu_dialog = Dialog(
             '<b>Новые айфоны</b> (2 000 000₽)\n'
         ),
         Row(
-            Start(
-                text=Const("🤑 Добавить доход"),
-                id="add_income",
-                state=states.AddFinanceEvent.MAIN,
-                data={'event_type': FinanceTransactionType.INCOME}
+            Button(
+                text=Const('🤑 Добавить доход'),
+                id='add_income',
+                on_click=on_start_add_event_dialog_click(FinanceTransactionType.INCOME)
             ),
-            Start(
-                text=Const("💳 Добавить расход"),
-                id="add_spend",
-                state=states.AddFinanceEvent.MAIN,
-                data={'event_type': FinanceTransactionType.SPENDING}
+            Button(
+                text=Const('💳 Добавить расход'),
+                id='add_spend',
+                on_click=on_start_add_event_dialog_click(FinanceTransactionType.SPENDING)
             ),
         ),
         Start(
