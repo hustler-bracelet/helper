@@ -8,7 +8,7 @@ from aiogram_dialog.widgets.kbd import Cancel, Calendar, ManagedCalendar, Calend
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
-from hustler_bracelet.bot.widgets import Today
+from hustler_bracelet.bot.dialogs.widgets import Today
 
 
 async def on_name_for_new_task_entered(

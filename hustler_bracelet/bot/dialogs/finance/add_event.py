@@ -15,7 +15,7 @@ from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
-from hustler_bracelet.bot.widgets import Today
+from hustler_bracelet.bot.dialogs.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
 from hustler_bracelet.finance.manager import FinanceManager
 
