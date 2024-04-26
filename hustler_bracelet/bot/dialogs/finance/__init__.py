@@ -3,23 +3,10 @@ from aiogram_dialog.widgets.kbd import Row, Start, Cancel
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.utils.lang_utils import formatted_balance_getter
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
 
-
-async def finance_menu_dialog_getter(dialog_manager: DialogManager, **kwargs):
-    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
-
-    async def _get_formatted_balance():
-        _raw_balance = await finance_manager.get_balance()
-        if _raw_balance.is_integer():
-            _raw_balance = int(_raw_balance)
-        _spaced_balance = f'{_raw_balance:,}'.replace(',', ' ')  # КОСТЫЛИ ЕБУЧИЕ
-        return f'{_spaced_balance}₽'
-
-    return {
-        'balance': await _get_formatted_balance()
-    }
 
 finance_menu_dialog = Dialog(
     Window(
@@ -75,6 +62,6 @@ finance_menu_dialog = Dialog(
         Cancel(),
 
         state=states.FinanceMainMenu.MAIN,
-        getter=finance_menu_dialog_getter
+        getter=formatted_balance_getter
     )
 )
