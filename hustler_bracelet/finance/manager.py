@@ -118,7 +118,7 @@ class FinanceManager:
 
         return
 
-    async def get_category_by_id(self, id_: str) -> Category | NoReturn:
+    async def get_category_by_id(self, id_: int) -> Category | NoReturn:
         category = (await self._session.exec(select(Category).where(Category.id == id_))).first()
 
         if category is None:
