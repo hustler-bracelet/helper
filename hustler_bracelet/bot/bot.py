@@ -10,6 +10,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove, Update
 from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 import config
 from hustler_bracelet.bot.dialogs.finance import finance_menu_dialog
@@ -22,7 +23,9 @@ from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning.add_task import add_task_dialog
 from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
+from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.finance.manager import FinanceManager
+from hustler_bracelet.user_manager import UserManager
 from .dialogs import states
 from .dialogs.counter import counter_dialog
 from .dialogs.layouts import layouts_dialog
@@ -66,6 +69,7 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 
 
 dialog_router = Router()
+
 dialog_router.include_routers(
     main_dialog,
     sport_main_menu_dialog,
@@ -109,10 +113,11 @@ async def database_middleware(
     familiar_event: types.Message | types.CallbackQuery = event.message or event.callback_query
 
     if familiar_event:
-        data['finance_manager'] = finance_manager = FinanceManager(familiar_event.from_user.id)
+        data['user_manager'] = user_manager = UserManager(familiar_event.from_user.id, AsyncSession(DATABASE_ENGINE))
+        data['finance_manager'] = FinanceManager(user_manager)
 
-        async with finance_manager:
-            await finance_manager.create_user_if_not_exists(familiar_event.from_user.first_name)
+        async with user_manager:
+            await user_manager.create_user_if_not_exists(familiar_event.from_user.first_name)
             return await handler(event, data)
     else:
         print(f'Some strange event: {event}')

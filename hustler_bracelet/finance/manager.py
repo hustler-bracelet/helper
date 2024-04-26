@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from datetime import date, datetime
 from typing import Sequence, NoReturn
 from uuid import uuid4 as create_uuid_v4
@@ -13,46 +14,24 @@ from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, Cat
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
 from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
+from hustler_bracelet.user_manager import UserManager
 
 
 class FinanceManager:
-    def __init__(self, telegram_id: int):
-        self._telegram_id = telegram_id
-        self._session = AsyncSession(DATABASE_ENGINE)
-
-    async def _is_user_exists(self):
-        query_result = (await self._session.exec(
-            select(User).where(User.telegram_id == self._telegram_id)
-        )).all()
-        return bool(query_result)
-
-    async def _create_new_user(self, telegram_name: str):
-        assert not await self._is_user_exists()
-
-        new_user = User(
-            telegram_id=self._telegram_id,
-            telegram_name=telegram_name,
-            current_balance=0.0
-        )
-        self._session.add(new_user)
-        await self._session.commit()
-
-        return new_user
-
-    async def create_user_if_not_exists(self, telegram_name: str):
-        if not await self._is_user_exists():
-            await self._create_new_user(telegram_name)
+    def __init__(self, user_manager: UserManager):
+        self._user_manager = user_manager
+        self._session = user_manager.get_database_session()
 
     async def get_balance(self) -> float:
         user = (await self._session.exec(
-            select(User).where(User.telegram_id == self._telegram_id)
+            select(User).where(User.telegram_id == self._user_manager.telegram_id)
         )).first()
         return user.current_balance
 
     async def get_all_categories(self, category_type: FinanceTransactionType) -> Sequence[Category]:
         query_results = (await self._session.exec(
             select(Category).where(
-                Category.telegram_id == self._telegram_id,
+                Category.telegram_id == self._user_manager.telegram_id,
                 Category.type == category_type
             )
         )).all()
@@ -62,7 +41,7 @@ class FinanceManager:
     async def get_all_events(self, category_type: FinanceTransactionType) -> Sequence[FinanceTransaction]:
         query_results = (await self._session.exec(
             select(FinanceTransaction).where(
-                FinanceTransaction.telegram_id == self._telegram_id,
+                FinanceTransaction.telegram_id == self._user_manager.telegram_id,
                 FinanceTransaction.type == category_type
             )
         )).all()
@@ -71,7 +50,7 @@ class FinanceManager:
     async def get_events_amount(self, category_type: FinanceTransactionType) -> int:
         query_results = (await self._session.exec(
             select(func.count(FinanceTransaction.id)).where(
-                FinanceTransaction.telegram_id == self._telegram_id,
+                FinanceTransaction.telegram_id == self._user_manager.telegram_id,
                 FinanceTransaction.type == category_type
             )
         )).one()
@@ -80,7 +59,7 @@ class FinanceManager:
     async def get_categories_amount(self, category_type: FinanceTransactionType) -> int:
         query_results = (await self._session.exec(
             select(func.count(Category.id)).where(
-                Category.telegram_id == self._telegram_id,
+                Category.telegram_id == self._user_manager.telegram_id,
                 Category.type == category_type
             )
         )).one()
@@ -91,7 +70,7 @@ class FinanceManager:
         categories_with_same_name = (await self._session.exec(
             select(Category).where(
                 Category.name == name,
-                Category.telegram_id == self._telegram_id,
+                Category.telegram_id == self._user_manager.telegram_id,
                 Category.type == category_type
             )
         )).all()
@@ -100,7 +79,7 @@ class FinanceManager:
 
         # Create the category
         new_category = Category(
-            telegram_id=self._telegram_id,
+            telegram_id=self._user_manager.telegram_id,
             name=name,
             type=category_type
         )
@@ -118,7 +97,7 @@ class FinanceManager:
 
         finance_transaction = FinanceTransaction(
             id=str(create_uuid_v4()),
-            telegram_id=self._telegram_id,
+            telegram_id=self._user_manager.telegram_id,
             type=category.type,
             category=category.id,
             value=value,
@@ -128,7 +107,7 @@ class FinanceManager:
         self._session.add(finance_transaction)
 
         user = (await self._session.exec(
-            select(User).where(User.telegram_id == self._telegram_id)
+            select(User).where(User.telegram_id == self._user_manager.telegram_id)
         )).first()
         if category.type is FinanceTransactionType.INCOME:
             user.current_balance += value
@@ -146,9 +125,3 @@ class FinanceManager:
             raise CategoryNotFoundError()
 
         return category
-
-    async def __aenter__(self):
-        return await self._session.__aenter__()
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        return await self._session.__aexit__(exc_type, exc_val, exc_tb)

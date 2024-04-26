@@ -1,3 +1,5 @@
+import config
+
 from aiogram import html
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.about import about_aiogram_dialog_button
@@ -19,7 +21,7 @@ about_bot_dialog = Dialog(
             '@farel106 - frontend\n'
             '\n'
             '⚙️ <b>Версия бота:</b>\n'
-            'hustler_bracelet 1.0 (5e5b16f)\n'
+            f'hustler_bracelet {config.VERSION} от {config.UPDATE_TIME}\n'
             '\n'
             f'Бот основан на {html.link("aiogram3", link="https://github.com/aiogram/aiogram")} (by RootJunior and the aiogram team) '
             f'и {html.link("aiogram_dialog", link="https://github.com/Tishka17/aiogram_dialog")} (by Tishka17).'
