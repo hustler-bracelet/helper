@@ -63,6 +63,8 @@ class AddFinanceCategory(StatesGroup):
 
 class DeleteFinanceCategory(StatesGroup):
     MAIN = State()
+    CHOOSE_CATEGORY = State()
+    FINAL = State()
 
 
 class Planning(StatesGroup):
