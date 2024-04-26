@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-from aiogram_dialog.widgets.kbd import Row, Button
+from aiogram_dialog.widgets.kbd import Row, Button, Cancel, Back
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
@@ -63,6 +63,7 @@ add_finance_category_dialog = Dialog(
             'Какой тип будет иметь новая категория?'
         ),
         get_choose_category_type_kb(on_category_type_selected),
+        Cancel(),
         state=states.AddFinanceCategory.MAIN
     ),
     Window(
@@ -72,6 +73,7 @@ add_finance_category_dialog = Dialog(
             'Какое имя будет у новой категории {finance_event_name}ов?'
         ),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
+        Back(),
         state=states.AddFinanceCategory.ENTER_NAME,
         getter=finance_event_words_getter,
     ),
