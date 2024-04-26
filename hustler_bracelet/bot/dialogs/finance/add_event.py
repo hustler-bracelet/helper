@@ -14,6 +14,7 @@ from aiogram_dialog.widgets.text import Const, Format
 from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
 from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
 from hustler_bracelet.bot.dialogs.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
@@ -75,7 +76,6 @@ async def on_choose_category_click(
 async def category_choose_window_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
     categories = await finance_manager.get_all_categories(dialog_manager.start_data['event_type'])
-    print(categories)
 
     return {
         'categories': [(category.name, category.id) for category in categories]
@@ -137,19 +137,7 @@ add_finance_event_dialog = Dialog(
             '\n'
             'Выбери категорию {finance_event_name}ов или создай новую:'
         ),
-        ScrollingGroup(
-            Select(
-                Format('{item[0]}'),
-                id='select_categories_for_new_event',
-                item_id_getter=operator.itemgetter(1),
-                items='categories',
-                on_click=on_choose_category_click
-            ),
-            id="scroll_categories_for_new_event",
-            width=1,
-            height=6,
-            hide_on_single_page=True
-        ),
+        get_choose_category_kb(on_choose_category_click),
         Button(text=Const('➕ Создать новую категорию'), id='add_fin_category', on_click=on_add_category_click),
         Cancel(),
         state=states.AddFinanceEvent.MAIN,
