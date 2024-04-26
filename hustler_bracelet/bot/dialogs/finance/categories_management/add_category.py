@@ -1,22 +1,27 @@
+from typing import Any
+
 from aiogram import types
+from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Row, Button
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_type_kb
 from hustler_bracelet.bot.utils import get_event_type
 from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.finance.manager import FinanceManager
 
 
-async def on_category_type_click(
-        callback: ChatEvent,
-        button: Button,
-        manager: DialogManager
+async def on_category_type_selected(
+        callback: CallbackQuery,
+        widget: Any,
+        manager: DialogManager,
+        item_id: str
 ):
-    manager.dialog_data['event_type'] = FinanceTransactionType(button.widget_id.split('_')[-1])
+    manager.dialog_data['event_type'] = FinanceTransactionType(item_id)
 
     await manager.next()
 
@@ -57,18 +62,7 @@ add_finance_category_dialog = Dialog(
             '\n'
             'Какой тип будет иметь новая категория?'
         ),
-        Row(
-            Button(
-                text=Const('Доходы'),
-                id='cat_type_income',
-                on_click=on_category_type_click
-            ),
-            Button(
-                text=Const('Расходы'),
-                id='cat_type_spending',
-                on_click=on_category_type_click
-            )
-        ),
+        get_choose_category_type_kb(on_category_type_selected),
         state=states.AddFinanceCategory.MAIN
     ),
     Window(
