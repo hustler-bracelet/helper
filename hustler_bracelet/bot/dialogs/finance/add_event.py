@@ -15,7 +15,7 @@ from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
-from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, formatted_event_value_getter
 from hustler_bracelet.bot.dialogs.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
 from hustler_bracelet.finance.manager import FinanceManager
@@ -180,10 +180,11 @@ add_finance_event_dialog = Dialog(
         Format(
             '{finance_event_emoji} <b>Добавление {finance_event_name}а</b>\n'
             '\n'
-            '✅ {capitalized_finance_event_name} {dialog_data[value]} за {dialog_data[event_date]} успешно зарегистрирован.'  # TODO: Сделать красивый рендеринг для event_date и value
+            '✅ {capitalized_finance_event_name} {value} за {dialog_data[event_date]} успешно зарегистрирован.'  # TODO: Сделать красивый рендеринг для event_date и value
         ),
         Cancel(Const('Ok')),
-        state=states.AddFinanceEvent.FINAL
+        state=states.AddFinanceEvent.FINAL,
+        getter=formatted_event_value_getter
     ),
     getter=finance_event_words_getter,
     on_process_result=on_process_result
