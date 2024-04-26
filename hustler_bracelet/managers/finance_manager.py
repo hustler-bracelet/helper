@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import Sequence, NoReturn
 from uuid import uuid4 as create_uuid_v4
 
+from sqlalchemy import delete
 from sqlalchemy.sql.functions import func
 from sqlmodel import select
 
@@ -86,7 +87,15 @@ class FinanceManager:
 
         return new_category
 
-    async def delete_category(self, category_to_delete: Category):
+    async def delete_category(self, category_to_delete: Category, delete_related_events: bool = True):
+        if delete_related_events:
+            await self._session.exec(
+                delete(FinanceTransaction).
+                where(
+                    FinanceTransaction.category.__eq__(category_to_delete.id)
+                )
+            )
+
         await self._session.delete(category_to_delete)
         await self._session.commit()
 
