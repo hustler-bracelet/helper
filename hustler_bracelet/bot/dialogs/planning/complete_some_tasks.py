@@ -6,21 +6,17 @@ from aiogram_dialog.widgets.kbd import Row, Cancel, Button, Multiselect, Column,
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.managers import FinanceManager
 
 
-async def get_tasks(**kwargs):
+async def tasks_getter(dialog_manager: DialogManager, **kwargs):
+    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
+
     return {
         'tasks': [
-            ('Пинать хуи 1', 1),
-            ('Пинать хуи 2', 2),
-            ('Пинать хуи 3', 3),
-            ('Пинать хуи 4', 4),
-            ('Пинать хуи 5', 5),
-            ('Пинать хуи 6', 6),
-            ('Пинать хуи 7', 7),
-            ('Пинать хуи 8', 8),
-            ('Пинать хуи 9', 9),
-            ('Пинать хуи 10', 10),
+            (await task.awaitable_attrs.name, await task.awaitable_attrs.id, print([await task.awaitable_attrs.id]))
+            for task in await finance_manager.get_tasks_sorted_by_planned_complete_date()
+            # TODO: Добавить прогрузку задач по частям, чтобы не грузить каждый раз все сто тыщ мильонов тасок
         ]
     }
 
@@ -30,9 +26,16 @@ async def on_complete_selected_tasks_click(
         button: Button,
         manager: DialogManager,
 ):
+    finance_manager: FinanceManager = manager.middleware_data['finance_manager']
     tasks_multiselect_widget: Multiselect = manager.find('mltslct_tasks_to_complete')
-    checked = tasks_multiselect_widget.get_checked()
-    await callback.answer(', '.join(checked))
+    completed_tasks_ids: list[int] = [*map(int, tasks_multiselect_widget.get_checked())]
+
+    if not completed_tasks_ids:
+        await callback.answer('Выберите хотя-бы одну задачу')
+        return
+    await finance_manager.mark_tasks_as_completed(completed_tasks_ids)
+
+    await manager.done()
 
 
 complete_some_tasks_dialog = Dialog(
@@ -68,6 +71,6 @@ complete_some_tasks_dialog = Dialog(
             )
         ),
         state=states.CompleteSomeTasks.MAIN,
-        getter=get_tasks
+        getter=tasks_getter
     )
 )

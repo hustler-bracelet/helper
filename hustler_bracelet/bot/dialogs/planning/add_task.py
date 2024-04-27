@@ -9,6 +9,7 @@ from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.widgets import Today
+from hustler_bracelet.managers import FinanceManager
 
 
 async def on_name_for_new_task_entered(
@@ -17,7 +18,7 @@ async def on_name_for_new_task_entered(
         dialog_manager: DialogManager,
         data: str
 ):
-    dialog_manager.dialog_data['task_name'] = message.text
+    dialog_manager.dialog_data['name'] = message.text
     await dialog_manager.next()
 
 
@@ -27,7 +28,12 @@ async def on_date_clicked(
         manager: DialogManager,
         selected_date: date
 ):
-    manager.dialog_data['task_date'] = selected_date
+    finance_manager: FinanceManager = manager.middleware_data['finance_manager']
+
+    manager.dialog_data['date'] = selected_date
+
+    await finance_manager.add_task(manager.dialog_data['name'], selected_date)
+
     await manager.next()
 
 
@@ -66,7 +72,7 @@ add_task_dialog = Dialog(
         Format(
             '➕ <b>Добавление задачи</b>\n'
             '\n'
-            '✅ Задача “{dialog_data[task_name]}” на {dialog_data[task_date]} успешно добавлена. (нет)'
+            '✅ Задача “{dialog_data[name]}” на {dialog_data[date]} успешно добавлена.'
         ),
         Cancel(Const('Ok')),
         state=states.AddTask.FINAL
