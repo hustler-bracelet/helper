@@ -6,7 +6,7 @@ from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.add_event import on_start_add_event_dialog_click
 from hustler_bracelet.bot.utils.lang_utils import formatted_balance_getter
 from hustler_bracelet.enums import FinanceTransactionType
-from hustler_bracelet.finance.manager import FinanceManager
+from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
 finance_menu_dialog = Dialog(

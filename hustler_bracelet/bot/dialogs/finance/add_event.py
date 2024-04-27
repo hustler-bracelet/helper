@@ -19,7 +19,7 @@ from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, fo
 from hustler_bracelet.bot.dialogs.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
 from hustler_bracelet.enums import FinanceTransactionType
-from hustler_bracelet.finance.manager import FinanceManager
+from hustler_bracelet.managers.finance_manager import FinanceManager
 
 _evaluator = SimpleEval()
 

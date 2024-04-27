@@ -25,8 +25,8 @@ from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning.add_task import add_task_dialog
 from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
 from hustler_bracelet.database.engine import DATABASE_ENGINE
-from hustler_bracelet.finance.manager import FinanceManager
-from hustler_bracelet.user_manager import UserManager
+from hustler_bracelet.managers.finance_manager import FinanceManager
+from hustler_bracelet.managers.user_manager import UserManager
 from .dialogs import states
 from .dialogs.counter import counter_dialog
 from .dialogs.layouts import layouts_dialog

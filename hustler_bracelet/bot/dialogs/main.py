@@ -6,7 +6,7 @@ from . import states
 from .finance.add_event import on_start_add_event_dialog_click
 from ..utils.lang_utils import formatted_balance_getter
 from ...enums import FinanceTransactionType
-from ...finance.manager import FinanceManager
+from ...managers.finance_manager import FinanceManager
 
 
 async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):

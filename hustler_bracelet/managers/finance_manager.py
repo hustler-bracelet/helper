@@ -6,15 +6,13 @@ from uuid import uuid4 as create_uuid_v4
 
 from sqlalchemy.sql.functions import func
 from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from hustler_bracelet.database.category import Category
-from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
 from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
-from hustler_bracelet.user_manager import UserManager
+from hustler_bracelet.managers.user_manager import UserManager
 
 
 class FinanceManager:

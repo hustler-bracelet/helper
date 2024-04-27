@@ -2,7 +2,7 @@ from aiogram_dialog import DialogManager
 
 from hustler_bracelet.bot.utils import get_event_type
 from hustler_bracelet.enums import FinanceTransactionType
-from hustler_bracelet.finance.manager import FinanceManager
+from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
 def get_finance_event_type_name(finance_event_type: FinanceTransactionType):

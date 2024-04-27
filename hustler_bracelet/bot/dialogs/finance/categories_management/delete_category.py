@@ -9,7 +9,7 @@ from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_type_kb, get_choose_category_kb
 from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter
 from hustler_bracelet.enums import FinanceTransactionType
-from hustler_bracelet.finance.manager import FinanceManager
+from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
 async def on_category_type_selected(
