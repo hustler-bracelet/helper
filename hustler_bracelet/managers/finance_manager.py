@@ -161,26 +161,53 @@ class FinanceManager:
 
         await self._session.commit()
 
-    async def get_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, excluding_completed: bool = True) -> Sequence[Task]:
+    async def get_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, *, completed: bool | None = False) -> Sequence[Task]:
         query = select(Task).where(
             Task.planned_complete_date == planned_complete_date,
 
         )
-        if excluding_completed:
+        if completed is not None:
             query = query.where(
-                Task.is_completed == False
+                Task.is_completed == completed
             )
 
         tasks = (await self._session.exec(query)).all()
 
         return tasks
 
-    async def get_tasks_sorted_by_planned_complete_date(self, excluding_completed: bool = True, limit: int | None = None) -> Sequence[Task]:
+    async def get_amount_of_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, *, completed: bool | None) -> Sequence[Task]:
+        query = select(func.count(Task.id)).where(
+            Task.planned_complete_date == planned_complete_date,
+        )
+        if completed is not None:
+            query = query.where(
+                Task.is_completed == completed
+            )
+
+        amount = (await self._session.exec(query)).one()
+
+        return amount
+
+    async def get_amount_of_tasks(self, *, completed: bool | None):
+        for task in (await self._session.exec(select(Task))).all():
+            print(await task.awaitable_attrs.planned_complete_date, await task.awaitable_attrs.is_completed)
+
+        query = select(func.count(Task.id))
+        if completed is not None:
+            query = query.where(
+                Task.is_completed == completed
+            )
+
+        amount = (await self._session.exec(query)).one()
+
+        return amount
+
+    async def get_tasks_sorted_by_planned_complete_date(self, *, completed: bool | None = False, limit: int | None = None) -> Sequence[Task]:
         query = select(Task)
 
-        if excluding_completed:
+        if completed is not None:
             query = query.where(
-                Task.is_completed == False
+                Task.is_completed == completed
             )
 
         if limit is not None:
@@ -192,13 +219,13 @@ class FinanceManager:
 
         return tasks
 
-    async def get_tasks_after_date(self, after_date: date, excluding_completed: bool = True):
+    async def get_tasks_after_date(self, after_date: date, *, completed: bool | None = False):
         query = select(Task).where(
             Task.planned_complete_date > after_date,
         )
-        if excluding_completed:
+        if completed is not None:
             query = query.where(
-                Task.is_completed == False
+                Task.is_completed == completed
             )
 
         tasks = (await self._session.exec(query)).all()
