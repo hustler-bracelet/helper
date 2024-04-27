@@ -9,8 +9,9 @@ from sqlalchemy.sql.functions import func
 from sqlmodel import select
 
 from hustler_bracelet.database.category import Category
-from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError
+from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
+from hustler_bracelet.database.task import Task
 from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.user_manager import UserManager
@@ -130,3 +131,76 @@ class FinanceManager:
             raise CategoryNotFoundError()
 
         return category
+
+    async def get_task_by_id(self, id_: int) -> Task | NoReturn:
+        task = (await self._session.exec(select(Task).where(Task.id == id_))).first()
+
+        if task is None:
+            raise TaskNotFoundError()
+
+        return task
+
+    async def add_task(self, name: str, planned_complete_date: date):
+        task = Task(
+            telegram_id=self._user_manager.telegram_id,
+            name=name,
+            added_on=datetime.now(),
+            planned_complete_date=planned_complete_date
+        )
+        self._session.add(task)
+
+        await self._session.commit()
+
+    async def mark_tasks_as_completed(self, tasks: Sequence[Task] | Sequence[int]):
+        if isinstance(tasks[0], int):
+            tasks: Sequence[int]
+            tasks: Sequence[Task] = [await self.get_task_by_id(task_id) for task_id in tasks]
+
+        for task in tasks:
+            task.is_completed = True
+
+        await self._session.commit()
+
+    async def get_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, excluding_completed: bool = True) -> Sequence[Task]:
+        query = select(Task).where(
+            Task.planned_complete_date == planned_complete_date,
+
+        )
+        if excluding_completed:
+            query = query.where(
+                Task.is_completed == False
+            )
+
+        tasks = (await self._session.exec(query)).all()
+
+        return tasks
+
+    async def get_tasks_sorted_by_planned_complete_date(self, excluding_completed: bool = True, limit: int | None = None) -> Sequence[Task]:
+        query = select(Task)
+
+        if excluding_completed:
+            query = query.where(
+                Task.is_completed == False
+            )
+
+        if limit is not None:
+            query = query.limit(limit)
+
+        query = query.order_by(Task.planned_complete_date.asc())
+
+        tasks = (await self._session.exec(query)).all()
+
+        return tasks
+
+    async def get_tasks_after_date(self, after_date: date, excluding_completed: bool = True):
+        query = select(Task).where(
+            Task.planned_complete_date > after_date,
+        )
+        if excluding_completed:
+            query = query.where(
+                Task.is_completed == False
+            )
+
+        tasks = (await self._session.exec(query)).all()
+
+        return tasks

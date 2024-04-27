@@ -12,3 +12,8 @@ class CategoryAlreadyExistsError(DatabaseException):
 class CategoryNotFoundError(DatabaseException):
     def __init__(self):
         super().__init__('Такой категории не существует')
+
+
+class TaskNotFoundError(DatabaseException):
+    def __init__(self):
+        super().__init__('Такой задачи не существует')
