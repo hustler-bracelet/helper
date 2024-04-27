@@ -92,7 +92,7 @@ class FinanceManager:
             await self._session.exec(
                 delete(FinanceTransaction).
                 where(
-                    FinanceTransaction.category.__eq__(category_to_delete.id)
+                    FinanceTransaction.category == category_to_delete.id
                 )
             )
 
@@ -122,8 +122,6 @@ class FinanceManager:
             user.current_balance -= value
 
         await self._session.commit()
-
-        return
 
     async def get_category_by_id(self, id_: int) -> Category | NoReturn:
         category = (await self._session.exec(select(Category).where(Category.id == id_))).first()
