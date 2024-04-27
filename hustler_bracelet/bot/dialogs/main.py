@@ -1,5 +1,5 @@
 from aiogram_dialog import Dialog, LaunchMode, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Start, Row
+from aiogram_dialog.widgets.kbd import Start, Row, Button
 from aiogram_dialog.widgets.text import Const, Format
 
 from . import states
@@ -50,17 +50,15 @@ main_dialog = Dialog(
         #     id="selects",
         #     state=states.Selects.MAIN,
         # ),
-        Start(
+        Button(
             text=Const('🤑 Добавить доход'),
             id='add_income',
-            state=states.AddFinanceEvent.MAIN,
-            data={'event_type': FinanceTransactionType.INCOME}
+            on_click=on_start_add_event_dialog_click(FinanceTransactionType.INCOME)
         ),
-        Start(
+        Button(
             text=Const('💳 Добавить расход'),
             id='add_spend',
-            state=states.AddFinanceEvent.MAIN,
-            data={'event_type': FinanceTransactionType.SPENDING}
+            on_click=on_start_add_event_dialog_click(FinanceTransactionType.SPENDING)
         ),
         Start(
             text=Const('📝 Добавить задачу'),

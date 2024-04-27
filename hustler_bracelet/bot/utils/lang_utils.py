@@ -46,14 +46,29 @@ async def finance_event_words_getter(dialog_manager: DialogManager, **kwargs):
     return {**words, **capitalized_words}
 
 
+def format_money_amount(money_amount: float) -> str:
+    if money_amount.is_integer():
+        money_amount = int(money_amount)
+    spaced_money_amount = f'{money_amount:_}'.replace('_', ' ')  # КОСТЫЛИ ЕБУЧИЕ
+
+    return f'{spaced_money_amount}₽'
+
+
 async def formatted_balance_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
     raw_balance = await finance_manager.get_balance()
-    if raw_balance.is_integer():
-        raw_balance = int(raw_balance)
-    spaced_balance = f'{raw_balance:_}'.replace('_', ' ')  # КОСТЫЛИ ЕБУЧИЕ
+    formatted_balance = format_money_amount(raw_balance)
 
     return {
-        'balance': f'{spaced_balance}₽'
+        'balance': formatted_balance
+    }
+
+
+async def formatted_event_value_getter(dialog_manager: DialogManager, **kwargs):
+    raw_value = dialog_manager.dialog_data['value']
+    formatted_value = format_money_amount(raw_value)
+
+    return {
+        'value': formatted_value
     }
