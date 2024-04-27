@@ -3,6 +3,8 @@ from aiogram_dialog.widgets.kbd import Start, Row
 from aiogram_dialog.widgets.text import Const, Format
 
 from . import states
+from .finance.add_event import on_start_add_event_dialog_click
+from ..utils.lang_utils import formatted_balance_getter
 from ...enums import FinanceTransactionType
 from ...finance.manager import FinanceManager
 
@@ -11,7 +13,7 @@ async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
     return {
-        'balance': await finance_manager.get_balance(),
+        **await formatted_balance_getter(dialog_manager, **kwargs),
         'incomes_amount': await finance_manager.get_events_amount(FinanceTransactionType.INCOME),
         'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING)
     }
