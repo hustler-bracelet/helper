@@ -30,7 +30,7 @@ finance_categories_management_menu_dialog = Dialog(
             '\n'
             '↗️ <b>Твои категории доходов:</b>'),
         List(
-            Format('● {item[0]} ({item[1]})'),
+            Format(' •  {item[0]} ({item[1]})'),
             items='income_list'
         ),
         Const(
@@ -38,7 +38,7 @@ finance_categories_management_menu_dialog = Dialog(
             '↙️ <b>Твои категории расходов:</b>'
         ),
         List(
-            Format('● {item[0]} ({item[1]})'),
+            Format(' •  {item[0]} ({item[1]})'),
             items='spending_list'
         ),
         Row(
