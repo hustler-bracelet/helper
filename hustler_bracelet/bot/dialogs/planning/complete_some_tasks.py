@@ -14,7 +14,7 @@ async def tasks_getter(dialog_manager: DialogManager, **kwargs):
 
     return {
         'tasks': [
-            (await task.awaitable_attrs.name, await task.awaitable_attrs.id, print([await task.awaitable_attrs.id]))
+            (await task.awaitable_attrs.name, await task.awaitable_attrs.id)
             for task in await finance_manager.get_tasks_sorted_by_planned_complete_date()
             # TODO: Добавить прогрузку задач по частям, чтобы не грузить каждый раз все сто тыщ мильонов тасок
         ]
