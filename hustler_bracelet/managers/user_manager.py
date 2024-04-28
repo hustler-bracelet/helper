@@ -37,9 +37,13 @@ class UserManager:
 
         return new_user
 
-    async def create_user_if_not_exists(self, telegram_name: str):
-        if not await self._is_user_exists():
+    async def create_user_if_not_exists(self, telegram_name: str) -> bool:
+        create_new_user = not await self._is_user_exists()
+
+        if create_new_user:
             await self.create_new_user(telegram_name)
+
+        return create_new_user
 
     async def __aenter__(self):
         return await self._session.__aenter__()

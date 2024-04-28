@@ -90,3 +90,11 @@ class AboutBot(StatesGroup):
 
 class EraseAllDataAboutUser(StatesGroup):
     MAIN = State()
+
+
+class OnBoarding(StatesGroup):
+    MAIN = State()
+    FINANCE = State()
+    PLANNING = State()
+    SPORT = State()
+    FINAL = State()

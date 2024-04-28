@@ -33,6 +33,10 @@ from .dialogs import states
 
 
 async def start(message: Message, dialog_manager: DialogManager):
+    if dialog_manager.middleware_data['user_created']:
+        await dialog_manager.start(states.OnBoarding.MAIN)
+        return
+
     # it is important to reset stack because user wants to restart everything
     await dialog_manager.start(states.Main.MAIN, mode=StartMode.RESET_STACK)
 
@@ -107,7 +111,7 @@ async def database_middleware(
         data['finance_manager'] = FinanceManager(user_manager)
 
         async with user_manager:
-            await user_manager.create_user_if_not_exists(familiar_event.from_user.first_name)
+            data['user_created'] = await user_manager.create_user_if_not_exists(familiar_event.from_user.first_name)
             return await handler(event, data)
     else:
         print(f'Some strange event: {event}')
