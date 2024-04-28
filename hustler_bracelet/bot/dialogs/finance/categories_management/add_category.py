@@ -68,7 +68,7 @@ add_finance_category_dialog = Dialog(
         Format(
             '{finance_event_emoji} <b>Добавление {finance_event_name}а</b>\n'
             '\n'
-            'У тебя нет ни одной категории дохода.\n'
+            'У тебя нет ни одной категории {finance_event_name}а.\n'
             'Введи название категории, от которой поступил доход, и я её создам'
         ),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
