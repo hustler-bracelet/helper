@@ -48,8 +48,8 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
     logging.error("Restarting dialog: %s", event.exception)
     if event.update.callback_query:
         await event.update.callback_query.answer(
-            "Bot process was restarted due to maintenance.\n"
-            "Redirecting to main menu.",
+            "Бот был перезапущен из-за технических работ.\n"
+            "Переходим в главное меню.",
         )
         if event.update.callback_query.message:
             try:
@@ -58,8 +58,8 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
                 pass  # whatever
     elif event.update.message:
         await event.update.message.answer(
-            "Bot process was restarted due to maintenance.\n"
-            "Redirecting to main menu.",
+            "Бот был перезапущен из-за технических работ.\n"
+            "Переходим в главное меню.",
             reply_markup=ReplyKeyboardRemove(),
         )
     await dialog_manager.start(

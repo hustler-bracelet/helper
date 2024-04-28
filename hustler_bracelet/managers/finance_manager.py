@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import random
+
 from datetime import date, datetime
 from typing import Sequence, NoReturn
-from uuid import uuid4 as create_uuid_v4
 
 from sqlalchemy import delete
 from sqlalchemy.sql.functions import func
@@ -15,6 +16,10 @@ from hustler_bracelet.database.task import Task
 from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.user_manager import UserManager
+
+
+def create_int_uid() -> int:
+    return int(''.join([str(random.randint(0, 9)) for _ in range(9)]))
 
 
 class FinanceManager:
@@ -104,7 +109,7 @@ class FinanceManager:
         value = float(value)
 
         finance_transaction = FinanceTransaction(
-            id=str(create_uuid_v4()),
+            id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,
             type=category.type,
             category=category.id,
@@ -141,15 +146,19 @@ class FinanceManager:
         return task
 
     async def add_task(self, name: str, planned_complete_date: date):
+        print(f'NOW ADDING TASK: {name}, {planned_complete_date}, {self._user_manager.telegram_id}')
         task = Task(
+            id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,
             name=name,
             added_on=datetime.now(),
             planned_complete_date=planned_complete_date
         )
-        self._session.add(task)
 
+        self._session.add(task)
         await self._session.commit()
+
+        return task
 
     async def mark_tasks_as_completed(self, tasks: Sequence[Task] | Sequence[int]):
         if isinstance(tasks[0], int):
@@ -163,8 +172,7 @@ class FinanceManager:
 
     async def get_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, *, completed: bool | None = False) -> Sequence[Task]:
         query = select(Task).where(
-            Task.planned_complete_date == planned_complete_date,
-
+            Task.planned_complete_date == planned_complete_date
         )
         if completed is not None:
             query = query.where(
@@ -174,6 +182,13 @@ class FinanceManager:
         tasks = (await self._session.exec(query)).all()
 
         return tasks
+
+    async def get_active_tasks(self) -> Sequence[Task]:
+        query = select(Task).where(
+            Task.telegram_id == self._user_manager.telegram_id
+        )
+        query = query.where(Task.is_completed == 0)  # FIXME HACK TODO XXX: this shit aint working if using not stmt
+        return (await self._session.exec(query)).all()
 
     async def get_amount_of_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, *, completed: bool | None) -> Sequence[Task]:
         query = select(func.count(Task.id)).where(

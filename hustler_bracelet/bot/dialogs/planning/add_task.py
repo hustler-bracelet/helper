@@ -28,11 +28,15 @@ async def on_date_clicked(
         manager: DialogManager,
         selected_date: date
 ):
+    print(selected_date)
     finance_manager: FinanceManager = manager.middleware_data['finance_manager']
 
     manager.dialog_data['date'] = selected_date
 
-    await finance_manager.add_task(manager.dialog_data['name'], selected_date)
+    await finance_manager.add_task(
+        name=manager.dialog_data['name'],
+        planned_complete_date=selected_date
+    )
 
     await manager.next()
 

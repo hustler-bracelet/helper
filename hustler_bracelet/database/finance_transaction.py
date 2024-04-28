@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from datetime import datetime, date
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -8,7 +9,7 @@ from hustler_bracelet.enums import FinanceTransactionType
 
 
 class FinanceTransaction(SQLModel, AsyncAttrs, table=True):
-    id: str | None = Field(primary_key=True)
+    id: int | None = Field(primary_key=True)
     telegram_id: int = Field(foreign_key='user.telegram_id')
     type: FinanceTransactionType
     category: int = Field(foreign_key='category.id')
