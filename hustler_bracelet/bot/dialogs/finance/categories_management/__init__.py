@@ -13,11 +13,17 @@ async def finance_categories_management_menu_getter(dialog_manager: DialogManage
 
     return {
         'income_list': [
-            (await category.awaitable_attrs.name, format_money_amount(10_000.)) for category in
+            (
+                await category.awaitable_attrs.name,
+                format_money_amount(await finance_manager.get_sum_of_finance_transactions_of_category(category))
+            ) for category in
             await finance_manager.get_all_categories(FinanceTransactionType.INCOME)
         ],
         'spending_list': [
-            (await category.awaitable_attrs.name, format_money_amount(10_000.)) for category in
+            (
+                await category.awaitable_attrs.name,
+                format_money_amount(await finance_manager.get_sum_of_finance_transactions_of_category(category))
+            ) for category in
             await finance_manager.get_all_categories(FinanceTransactionType.SPENDING)
         ],
     }
