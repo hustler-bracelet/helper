@@ -74,7 +74,7 @@ async def formatted_event_value_getter(dialog_manager: DialogManager, **kwargs):
     }
 
 
-def choose_plural_form(number: int, titles: tuple[str]):
+def choose_plural_form(number: int, titles: tuple[str, ...] | list[str]):
     """
     :param number:
     :param titles: 1 Минута, 2 минуты, 0 минут
