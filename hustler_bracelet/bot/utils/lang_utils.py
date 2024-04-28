@@ -72,3 +72,21 @@ async def formatted_event_value_getter(dialog_manager: DialogManager, **kwargs):
     return {
         'value': formatted_value
     }
+
+
+def choose_plural_form(number: int, titles: tuple[str]):
+    """
+    :param number:
+    :param titles: 1 Минута, 2 минуты, 0 минут
+    :return:
+    """
+
+    cases = [2, 0, 1, 1, 1, 2]
+    if 4 < number % 100 < 20:
+        idx = 2
+    elif number % 10 < 5:
+        idx = cases[number % 10]
+    else:
+        idx = cases[5]
+
+    return titles[idx]
