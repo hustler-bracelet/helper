@@ -217,10 +217,11 @@ class FinanceManager:
         return amount
 
     async def get_amount_of_tasks(self, *, completed: bool | None):
-        for task in (await self._session.exec(select(Task))).all():
-            print(await task.awaitable_attrs.planned_complete_date, await task.awaitable_attrs.is_completed)
 
-        query = select(func.count(Task.id))
+        query = select(func.count(Task.id)).where(
+            Task.telegram_id == self._user_manager.telegram_id
+        )
+
         if completed is not None:
             query = query.where(
                 Task.is_completed == completed
@@ -231,7 +232,9 @@ class FinanceManager:
         return amount
 
     async def get_tasks_sorted_by_planned_complete_date(self, *, completed: bool | None = False, limit: int | None = None) -> Sequence[Task]:
-        query = select(Task)
+        query = select(Task).where(
+            Task.telegram_id == self._user_manager.telegram_id
+        )
 
         if completed is not None:
             query = query.where(
@@ -249,6 +252,7 @@ class FinanceManager:
 
     async def get_tasks_after_date(self, after_date: date, *, completed: bool | None = False):
         query = select(Task).where(
+            Task.telegram_id == self._user_manager.telegram_id,
             Task.planned_complete_date > after_date,
         )
         if completed is not None:
