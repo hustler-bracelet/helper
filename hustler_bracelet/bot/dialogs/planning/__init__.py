@@ -2,78 +2,49 @@ from datetime import date, timedelta
 
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Start, Cancel
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Const, Format, List, Jinja
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.utils.lang_utils import choose_plural_form
 from hustler_bracelet.managers import FinanceManager
 from hustler_bracelet.database.task import Task
 
 
-async def planning_main_menu_statistic_getter(dialog_manager: DialogManager, **kwargs):
+async def planning_data_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
-    async def get_all_tasks_text():
-        all_tasks = await finance_manager.get_active_tasks()
+    all_tasks = await finance_manager.get_active_tasks()
 
-        tasks_for_today = [
-            task for task in all_tasks if task.planned_complete_date == date.today()
-        ]
-        tasks_for_today_amount = len(tasks_for_today)
+    tasks_for_today = [
+        task for task in all_tasks if task.planned_complete_date == date.today()
+    ]
+    tasks_for_today_amount = len(tasks_for_today)
 
-        tasks_for_tomorrow = [
-            task for task in all_tasks if task.planned_complete_date == date.today() + timedelta(days=1)
-        ]
-        tasks_for_tomorrow_amount = len(tasks_for_tomorrow)
+    tasks_for_tomorrow = [
+        task for task in all_tasks if task.planned_complete_date == date.today() + timedelta(days=1)
+    ]
+    tasks_for_tomorrow_amount = len(tasks_for_tomorrow)
 
-        all_tasks = [task for task in all_tasks if task not in tasks_for_today and task not in tasks_for_tomorrow]
-
-        other_tasks_sorted: dict[date, list[Task]] = {}
-        for task in all_tasks:
-            if task.planned_complete_date not in other_tasks_sorted.keys():
-                other_tasks_sorted[task.planned_complete_date] = []
-            other_tasks_sorted[task.planned_complete_date].append(task)
-
-        text = ''
-        if tasks_for_today_amount == 0:
-            text += '📝 На сегодня нет задач.\n\n'
-        else:
-            text += f'📝 {tasks_for_today_amount} задач на сегодня:\n'
-            for task in tasks_for_today:
-                text += f' •  {task.name}\n'
-            text += '\n'
-
-        if tasks_for_tomorrow_amount == 0:
-            text += '🕐  На завтра нет задач.\n\n'
-        else:
-            text += f'🕐 {tasks_for_tomorrow_amount} задач на завтра:\n'
-            for task in tasks_for_tomorrow:
-                text += f' •  {task.name}\n'
-            text += '\n'
-
-        if not other_tasks_sorted:
-            pass
-        else:
-            for date_, tasks_for_this_date in other_tasks_sorted.items():
-                tasks_for_this_date_amount = len(tasks_for_this_date)
-                text += f'📆 {tasks_for_this_date_amount} задач на {date_}:\n'
-                for task in tasks_for_this_date:
-                    text += f' •  {task.name}\n'
-            text += '\n'
-
-        uncompleted_tasks_amount = await finance_manager.get_amount_of_tasks(completed=False)
-        if uncompleted_tasks_amount > 0:
-            text += f'💪 У тебя {uncompleted_tasks_amount} задач к выполнению. Поворкаем?'
-            text += '\n'
-
-        completed_tasks_amount = await finance_manager.get_amount_of_tasks(completed=True)
-        if completed_tasks_amount > 0:
-            text += f'📊 Ты закрыл уже {completed_tasks_amount} задач. Неплохо!'
-            text += '\n'
-
-        return text
+    other_tasks_sorted: dict[date, list[Task]] = {}
+    for task in all_tasks:
+        if task.planned_complete_date not in other_tasks_sorted.keys():
+            other_tasks_sorted[task.planned_complete_date] = []
+        other_tasks_sorted[task.planned_complete_date].append(task)
 
     return {
-        'all_tasks': await get_all_tasks_text(),
+        'tasks': {
+            f'📝 {tasks_for_today_amount} '
+            f'{choose_plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
+            f'на сегодня': (tasks_for_today, '📝 На сегодня нет задач'),
+
+            f'🕐 и ещё {tasks_for_tomorrow_amount} '
+            f'{choose_plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))} '
+            f'на завтра': (tasks_for_tomorrow, '🕐 На завтра нет задач'),
+
+            **{
+                f'📆 {len(tasks_for_this_date)} задач на {date_}': (tasks_for_this_date, '') for date_, tasks_for_this_date in other_tasks_sorted.items()
+            },
+        },
         'today_uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks_filtered_by_planned_complete_date(
             date.today(),
             completed=False
@@ -89,10 +60,28 @@ async def planning_main_menu_statistic_getter(dialog_manager: DialogManager, **k
 
 planning_main_menu_dialog = Dialog(
     Window(
-        Format(
-            '✅ <b>Планирование</b>\n'
-            '\n'
-            '{all_tasks}'
+        Const(
+            '✅ <b>Планирование</b>'
+        ),
+        Jinja(
+            '{% for category, (tasks, text_for_empty_tasks) in tasks.items() %}'
+            '{% if tasks %}'
+            '<b>\n{{ category }}:</b>\n'
+            '{% for task in tasks %}'
+            ' •  {{ task.name }}\n'
+            '{% endfor %}'
+            '{% else %}'
+            '<b>\n{{ text_for_empty_tasks }}</b>\n'
+            '{% endif %}'
+            '{% endfor %}'
+        ),
+        Jinja(
+            '{% if uncompleted_tasks_amount > 0 %}\n'
+            '💪 У тебя {{ uncompleted_tasks_amount }} задач к выполнению. Поворкаем?\n'
+            '{% endif %}\n'
+            '{% if completed_tasks_amount > 0 %}\n'
+            '📊 Ты закрыл уже {{ completed_tasks_amount }} задач. Неплохо!\n'
+            '{% endif %}'
         ),
         Start(
             text=Const('➕ Добавить задачу'),
@@ -106,6 +95,6 @@ planning_main_menu_dialog = Dialog(
         ),
         Cancel(),
         state=states.Planning.MAIN,
-        getter=planning_main_menu_statistic_getter
+        getter=planning_data_getter
     )
 )
