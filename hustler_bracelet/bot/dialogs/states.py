@@ -1,16 +1,6 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class Scrolls(StatesGroup):
-    MAIN = State()
-    DEFAULT_PAGER = State()
-    PAGERS = State()
-    LIST = State()
-    TEXT = State()
-    STUB = State()
-    SYNC = State()
-
-
 class Main(StatesGroup):
     MAIN = State()
 
@@ -100,25 +90,3 @@ class AboutBot(StatesGroup):
 
 class EraseAllDataAboutUser(StatesGroup):
     MAIN = State()
-
-
-class OnBoarding(StatesGroup):
-    MAIN = State()
-
-
-class Counter(StatesGroup):
-    MAIN = State()
-
-
-class Multiwidget(StatesGroup):
-    MAIN = State()
-
-
-class ReplyKeyboard(StatesGroup):
-    MAIN = State()
-
-
-class Switch(StatesGroup):
-    MAIN = State()
-    INPUT = State()
-    LAST = State()

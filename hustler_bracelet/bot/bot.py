@@ -18,6 +18,8 @@ from hustler_bracelet.bot.dialogs.finance.add_event import add_finance_event_dia
 from hustler_bracelet.bot.dialogs.finance.categories_management import finance_categories_management_menu_dialog
 from hustler_bracelet.bot.dialogs.finance.categories_management.add_category import add_finance_category_dialog
 from hustler_bracelet.bot.dialogs.finance.categories_management.delete_category import delete_finance_category_dialog
+from hustler_bracelet.bot.dialogs.main import main_dialog
+from hustler_bracelet.bot.dialogs.onboarding import onboarding_dialog
 from hustler_bracelet.bot.dialogs.settings import settings_main_menu_dialog
 from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
 from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
@@ -28,14 +30,6 @@ from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.managers.finance_manager import FinanceManager
 from hustler_bracelet.managers.user_manager import UserManager
 from .dialogs import states
-from .dialogs.counter import counter_dialog
-from .dialogs.layouts import layouts_dialog
-from .dialogs.main import main_dialog
-from .dialogs.mutltiwidget import multiwidget_dialog
-from .dialogs.reply_buttons import reply_kbd_dialog
-from .dialogs.scrolls import scroll_dialog
-from .dialogs.select import selects_dialog
-from .dialogs.switch import switch_dialog
 
 
 async def start(message: Message, dialog_manager: DialogManager):
@@ -72,6 +66,7 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 dialog_router = Router()
 
 dialog_router.include_routers(
+    onboarding_dialog,
     main_dialog,
     sport_main_menu_dialog,
     delete_finance_category_dialog,
@@ -80,17 +75,10 @@ dialog_router.include_routers(
     complete_some_tasks_dialog,
     settings_main_menu_dialog,
     about_bot_dialog,
-    layouts_dialog,
-    scroll_dialog,
     finance_menu_dialog,
     finance_categories_management_menu_dialog,
     add_finance_event_dialog,
     add_finance_category_dialog,
-    selects_dialog,
-    counter_dialog,
-    multiwidget_dialog,
-    switch_dialog,
-    reply_kbd_dialog,
 )
 
 
