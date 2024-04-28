@@ -119,15 +119,28 @@ class FinanceManager:
         )
         self._session.add(finance_transaction)
 
-        user = (await self._session.exec(
-            select(User).where(User.telegram_id == self._user_manager.telegram_id)
-        )).first()
+        user = (
+            await self._session.exec(
+                select(User).where(User.telegram_id == self._user_manager.telegram_id)
+            )
+        ).first()
         if category.type is FinanceTransactionType.INCOME:
             user.current_balance += value
         else:
             user.current_balance -= value
 
         await self._session.commit()
+
+    async def get_sum_of_finance_transactions_of_category(self, category: Category) -> float:
+        sum = (
+            await self._session.exec(
+                select(func.sum(FinanceTransaction.value)).where(
+                    FinanceTransaction.category == category.id
+                )
+            )
+        ).one()
+
+        return sum or 0.
 
     async def get_category_by_id(self, id_: int) -> Category | NoReturn:
         category = (await self._session.exec(select(Category).where(Category.id == id_))).first()
