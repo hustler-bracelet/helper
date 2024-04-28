@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from aiogram_dialog import Dialog, LaunchMode, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Start, Row, Button
 from aiogram_dialog.widgets.text import Const, Format
@@ -12,10 +14,42 @@ from ...managers.finance_manager import FinanceManager
 async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
+    async def get_tasks_for_today_and_tomorrow():
+        all_tasks = await finance_manager.get_active_tasks()
+        tasks_for_today = [
+            task for task in all_tasks if task.planned_complete_date == date.today()
+        ]
+        tasks_for_today_amount = len(tasks_for_today)
+
+        tasks_for_tomorrow = [
+            task for task in all_tasks if task.planned_complete_date == date.today() + timedelta(days=1)
+        ]
+        tasks_for_tomorrow_amount = len(tasks_for_tomorrow)
+
+        text = ''
+        if tasks_for_today_amount == 0:
+            text += '<b>📝 На сегодня у тебя нет задач.</b>\n\n'
+        else:
+            text += f'<b>📝 На сегодня у тебя {tasks_for_today_amount} задач:</b>\n'
+            for task in tasks_for_today:
+                text += f' •  {task.name}\n'
+            text += '\n'
+
+        if tasks_for_tomorrow_amount == 0:
+            text += '<b>🕐 На завтра у тебя нет задач.</b>\n\n'
+        else:
+            text += f'<b>🕐 И ещё {tasks_for_tomorrow_amount} задач на завтра:</b>\n'
+            for task in tasks_for_tomorrow:
+                text += f' •  {task.name}\n'
+            text += '\n'
+
+        return text
+
     return {
         **await formatted_balance_getter(dialog_manager, **kwargs),
         'incomes_amount': await finance_manager.get_events_amount(FinanceTransactionType.INCOME),
-        'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING)
+        'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING),
+        'tasks_text': await get_tasks_for_today_and_tomorrow()
     }
 
 
@@ -25,15 +59,10 @@ main_dialog = Dialog(
             '👋 <b>Привет, хаслер!</b>\n'
             'Вот твоя сводка на сегодня:\n'
             '\n'
-            '💵 <b>Твой капитал:</b> {balance}₽\n'
+            '💵 <b>Твой капитал:</b> {balance}\n'
             '• Сегодня было {incomes_amount} прихода и {spends_amount} расходов\n'  # TODO: добавить склонение "прихода" и "расходов" 
             '\n'
-            '📝 <b>2 задачи на сегодня:</b>\n'
-            '• Налить трафа Ване\n'
-            '• Вынести мусор\n'
-            '\n'
-            '🕔 <b>И ещё 1 задача на завтра:</b>\n'
-            '• Инвайт на фотостудию\n'
+            '{tasks_text}'
         ),
         # Start(
         #     text=Const("📐 Layout widgets"),

@@ -58,7 +58,17 @@ async def planning_main_menu_statistic_getter(dialog_manager: DialogManager, **k
                 text += f'📆 {tasks_for_this_date_amount} задач на {date_}:\n'
                 for task in tasks_for_this_date:
                     text += f' •  {task.name}\n'
-                text += '\n'
+            text += '\n'
+
+        uncompleted_tasks_amount = await finance_manager.get_amount_of_tasks(completed=False)
+        if uncompleted_tasks_amount > 0:
+            text += f'💪 У тебя {uncompleted_tasks_amount} задач к выполнению. Поворкаем?'
+            text += '\n'
+
+        completed_tasks_amount = await finance_manager.get_amount_of_tasks(completed=True)
+        if completed_tasks_amount > 0:
+            text += f'📊 Ты закрыл уже {completed_tasks_amount} задач. Неплохо!'
+            text += '\n'
 
         return text
 
@@ -80,12 +90,9 @@ async def planning_main_menu_statistic_getter(dialog_manager: DialogManager, **k
 planning_main_menu_dialog = Dialog(
     Window(
         Format(
-            '✅ Планирование\n'
+            '✅ <b>Планирование</b>\n'
             '\n'
             '{all_tasks}'
-            '💪 У тебя {uncompleted_tasks_amount} задач к выполнению. Поворкаем?\n'
-            '\n'
-            '📊 Ты закрыл уже {completed_tasks_amount} задач. Неплохо!'
         ),
         Start(
             text=Const('➕ Добавить задачу'),

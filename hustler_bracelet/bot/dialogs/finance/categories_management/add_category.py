@@ -63,8 +63,6 @@ async def on_cancel_click(
     )
 
 
-
-
 add_finance_category_dialog = Dialog(
     Window(
         Format(
