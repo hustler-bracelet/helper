@@ -10,52 +10,61 @@ from hustler_bracelet.managers import FinanceManager
 from hustler_bracelet.database.task import Task
 
 
-async def planning_data_getter(dialog_manager: DialogManager, **kwargs):
-    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
+def get_planning_data_getter(include_other_days: bool = True):
+    async def wrapped(dialog_manager: DialogManager, **kwargs):
+        finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
-    all_tasks = await finance_manager.get_active_tasks()
+        all_tasks = await finance_manager.get_active_tasks()
 
-    tasks_for_today = [
-        task for task in all_tasks if task.planned_complete_date == date.today()
-    ]
-    tasks_for_today_amount = len(tasks_for_today)
+        tasks_for_today = [
+            task for task in all_tasks if task.planned_complete_date == date.today()
+        ]
+        tasks_for_today_amount = len(tasks_for_today)
 
-    tasks_for_tomorrow = [
-        task for task in all_tasks if task.planned_complete_date == date.today() + timedelta(days=1)
-    ]
-    tasks_for_tomorrow_amount = len(tasks_for_tomorrow)
+        tasks_for_tomorrow = [
+            task for task in all_tasks if task.planned_complete_date == date.today() + timedelta(days=1)
+        ]
+        tasks_for_tomorrow_amount = len(tasks_for_tomorrow)
 
-    other_tasks_sorted: dict[date, list[Task]] = {}
-    for task in all_tasks:
-        if task.planned_complete_date not in other_tasks_sorted.keys():
-            other_tasks_sorted[task.planned_complete_date] = []
-        other_tasks_sorted[task.planned_complete_date].append(task)
+        if include_other_days:
+            other_tasks_sorted = {}
+            for task in all_tasks:
+                if task.planned_complete_date not in other_tasks_sorted.keys():
+                    other_tasks_sorted[task.planned_complete_date] = []
+                other_tasks_sorted[task.planned_complete_date].append(task)
 
-    return {
-        'tasks': {
-            f'📝 {tasks_for_today_amount} '
-            f'{choose_plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
-            f'на сегодня': (tasks_for_today, '📝 На сегодня нет задач'),
+            other_tasks_sorted = dict(sorted(other_tasks_sorted.items(), key=lambda item: item[0]))
+        else:
+            other_tasks_sorted = {}
 
-            f'🕐 и ещё {tasks_for_tomorrow_amount} '
-            f'{choose_plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))} '
-            f'на завтра': (tasks_for_tomorrow, '🕐 На завтра нет задач'),
+        other_tasks_sorted: dict[date, list[Task]]
 
-            **{
-                f'📆 {len(tasks_for_this_date)} задач на {date_}': (tasks_for_this_date, '') for date_, tasks_for_this_date in other_tasks_sorted.items()
+        return {
+            'tasks': {
+                f'📝 {tasks_for_today_amount} '
+                f'{choose_plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
+                f'на сегодня': (tasks_for_today, '📝 На сегодня нет задач'),
+
+                f'🕐 и ещё {tasks_for_tomorrow_amount} '
+                f'{choose_plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))} '
+                f'на завтра': (tasks_for_tomorrow, '🕐 На завтра нет задач'),
+
+                **{
+                    f'📆 {len(tasks_for_this_date)} задач на {date_}': (tasks_for_this_date, '') for date_, tasks_for_this_date in other_tasks_sorted.items()
+                },
             },
-        },
-        'today_uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks_filtered_by_planned_complete_date(
-            date.today(),
-            completed=False
-        ),
-        'tomorrow_uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks_filtered_by_planned_complete_date(
-            date.today() + timedelta(days=1),
-            completed=False
-        ),
-        'uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks(completed=False),
-        'completed_tasks_amount': await finance_manager.get_amount_of_tasks(completed=True),
-    }
+            'today_uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks_filtered_by_planned_complete_date(
+                date.today(),
+                completed=False
+            ),
+            'tomorrow_uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks_filtered_by_planned_complete_date(
+                date.today() + timedelta(days=1),
+                completed=False
+            ),
+            'uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks(completed=False),
+            'completed_tasks_amount': await finance_manager.get_amount_of_tasks(completed=True),
+        }
+    return wrapped
 
 
 planning_main_menu_dialog = Dialog(
@@ -95,6 +104,6 @@ planning_main_menu_dialog = Dialog(
         ),
         Cancel(),
         state=states.Planning.MAIN,
-        getter=planning_data_getter
+        getter=get_planning_data_getter()
     )
 )
