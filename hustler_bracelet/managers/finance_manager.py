@@ -159,7 +159,6 @@ class FinanceManager:
         return task
 
     async def add_task(self, name: str, planned_complete_date: date):
-        print(f'NOW ADDING TASK: {name}, {planned_complete_date}, {self._user_manager.telegram_id}')
         task = Task(
             id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,

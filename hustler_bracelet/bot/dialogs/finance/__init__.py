@@ -1,21 +1,21 @@
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Row, Start, Cancel, Button
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Const, Format, Jinja
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.add_event import on_start_add_event_dialog_click
-from hustler_bracelet.bot.utils.lang_utils import formatted_balance_getter
+from hustler_bracelet.bot.utils.lang_utils import balance_getter
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
 finance_menu_dialog = Dialog(
     Window(
-        Format(
+        Jinja(
             '\n'
             '💸 <b>Финансы</b>\n'
             '\n'
-            '💵 <b>Твой капитал:</b> {balance}\n'
+            '💵 <b>Твой капитал:</b> {{ balance|money }}\n'
             '\n'
             '<b>↗ Доходы:</b>\n'
             '<b>• За сегодня:</b> 5 000₽ (2 операции)\n'
@@ -61,6 +61,6 @@ finance_menu_dialog = Dialog(
         Cancel(Const('❌ Отмена')),
 
         state=states.FinanceMainMenu.MAIN,
-        getter=formatted_balance_getter
+        getter=balance_getter
     )
 )

@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.text import Const, Format, Jinja
 from . import states
 from .finance.add_event import on_start_add_event_dialog_click
 from .planning import get_jinja_widget_for_tasks_displaying, get_planning_data_getter
-from ..utils.lang_utils import formatted_balance_getter
+from ..utils.lang_utils import balance_getter
 from ...enums import FinanceTransactionType
 from ...managers.finance_manager import FinanceManager
 
@@ -16,7 +16,7 @@ async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
     return {
-        **await formatted_balance_getter(dialog_manager, **kwargs),
+        **await balance_getter(dialog_manager, **kwargs),
         'incomes_amount': await finance_manager.get_events_amount(FinanceTransactionType.INCOME),
         'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING)
     }
@@ -28,7 +28,7 @@ main_dialog = Dialog(
             '👋 <b>Привет, хаслер!</b>\n'
             'Вот твоя сводка на сегодня:\n'
             '\n'
-            '💵 <b>Твой капитал:</b> {balance}\n'
+            '💵 <b>Твой капитал:</b> {{ balance | money }}\n'
             '• Сегодня было {{ incomes_amount|plural(["приход", "прихода", "приходов"]) }} '
             'и {{ incomes_amount|plural(["расход", "расхода", "расходов"]) }}'
         ),

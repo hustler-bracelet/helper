@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Cancel, Calendar, ManagedCalendar, CalendarConfig, Back
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Const, Format, Jinja
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.widgets import Today
@@ -73,10 +73,10 @@ add_task_dialog = Dialog(
         state=states.AddTask.GET_DATE
     ),
     Window(
-        Format(
+        Jinja(
             '➕ <b>Добавление задачи</b>\n'
             '\n'
-            '✅ Задача “{dialog_data[name]}” на {dialog_data[date]} успешно добавлена.'
+            '✅ Задача “{{ dialog_data[name] }}” на {{ dialog_data[date]|date }} успешно добавлена.'
         ),
         Cancel(Const('👌 Ок')),
         state=states.AddTask.FINAL

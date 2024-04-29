@@ -57,27 +57,23 @@ def format_money_amount(money_amount: float) -> str:
     return f'{spaced_money_amount}₽'
 
 
-async def formatted_balance_getter(dialog_manager: DialogManager, **kwargs):
+async def balance_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
-    raw_balance = await finance_manager.get_balance()
-    formatted_balance = format_money_amount(raw_balance)
+    balance = await finance_manager.get_balance()
 
     return {
-        'balance': formatted_balance
+        'balance': balance
     }
 
 
-async def formatted_event_value_getter(dialog_manager: DialogManager, **kwargs):
-    raw_value = dialog_manager.dialog_data['value']
-    formatted_value = format_money_amount(raw_value)
-
+async def event_value_getter(dialog_manager: DialogManager, **kwargs):
     return {
-        'value': formatted_value
+        'value': dialog_manager.dialog_data['value']
     }
 
 
-def plural_form(number: int, titles: tuple[str, ...] | list[str]):
+def plural_form(number: int, titles: tuple[str, ...] | list[str], include_number: bool = True):
     """
     :param number:
     :param titles: 1 Минута, 2 минуты, 0 минут
@@ -92,7 +88,10 @@ def plural_form(number: int, titles: tuple[str, ...] | list[str]):
     else:
         idx = cases[5]
 
-    return f'{number} {titles[idx]}'
+    title = titles[idx]
+    if include_number:
+        return f'{number} {title}'
+    return title
 
 
 def represent_date(date: datetime.date) -> str:
@@ -111,5 +110,6 @@ def represent_date(date: datetime.date) -> str:
 def get_jinja_filters() -> dict[str, Callable[..., str]]:
     return {
         'plural': plural_form,
-        'represent_date': represent_date
+        'date': represent_date,
+        'money': format_money_amount
     }

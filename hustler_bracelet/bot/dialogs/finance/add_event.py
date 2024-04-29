@@ -10,12 +10,12 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
     Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select, Cancel
 )
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Const, Format, Jinja
 from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
-from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, formatted_event_value_getter
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter
 from hustler_bracelet.bot.dialogs.widgets import Today
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
 from hustler_bracelet.enums import FinanceTransactionType
@@ -213,14 +213,14 @@ add_finance_event_dialog = Dialog(
         state=states.AddFinanceEvent.CHOOSE_DATE,
     ),
     Window(
-        Format(
-            '{finance_event_emoji} <b>Добавление {finance_event_name}а</b>\n'
+        Jinja(
+            '{{ finance_event_emoji }} <b>Добавление {{ finance_event_name }}а</b>\n'
             '\n'
-            '✅ {capitalized_finance_event_name} {value} за {dialog_data[event_date]} успешно зарегистрирован.'  # TODO: Сделать красивый рендеринг для event_date и value
+            '✅ {{ capitalized_finance_event_name }} {{ value | money }} за {{ dialog_data["event_date"] | date }} успешно зарегистрирован.'
         ),
         Cancel(Const('👌 Ок')),
         state=states.AddFinanceEvent.FINAL,
-        getter=formatted_event_value_getter
+        getter=event_value_getter
     ),
     getter=finance_event_words_getter,
     on_process_result=on_process_result
