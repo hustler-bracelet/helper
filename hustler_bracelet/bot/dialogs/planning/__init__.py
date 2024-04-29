@@ -94,7 +94,7 @@ planning_main_menu_dialog = Dialog(
             '💪 У тебя {{ uncompleted_tasks_amount|plural(["задача", "задачи", "задач"]) }} к выполнению. Поворкаем?\n'
             '{% endif %}\n'
             '{% if completed_tasks_amount > 0 %}\n'
-            '📊 Ты закрыл уже {{ completed_tasks_amount|plural(["задача", "задачи", "задач"]) }}. Неплохо!\n'
+            '📊 Ты закрыл уже {{ completed_tasks_amount|plural(["задачу", "задачи", "задач"]) }}. Неплохо!\n'
             '{% endif %}'
         ),
         Start(
