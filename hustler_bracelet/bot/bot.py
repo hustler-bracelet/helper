@@ -10,7 +10,9 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove, Update
 from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
+from aiogram_dialog.widgets.text import setup_jinja
 from sqlmodel.ext.asyncio.session import AsyncSession
+import aiogram_dialog
 
 import config
 from hustler_bracelet.bot.dialogs.finance import finance_menu_dialog
@@ -26,6 +28,7 @@ from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning.add_task import add_task_dialog
 from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
+from hustler_bracelet.bot.utils.lang_utils import get_jinja_filters
 from hustler_bracelet.database.engine import DATABASE_ENGINE
 from hustler_bracelet.managers.finance_manager import FinanceManager
 from hustler_bracelet.managers.user_manager import UserManager
@@ -123,6 +126,8 @@ async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     dp = setup_dp()
+
+    aiogram_dialog.widgets.text.jinja.default_env = setup_jinja(dp, filters=get_jinja_filters())
 
     dp.update.outer_middleware.register(database_middleware)
 

@@ -2,7 +2,6 @@ from aiogram_dialog import DialogManager
 
 from hustler_bracelet.enums import FinanceTransactionType
 
-
 __all__ = ('get_event_type',)
 
 

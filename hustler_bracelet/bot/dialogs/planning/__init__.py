@@ -5,7 +5,7 @@ from aiogram_dialog.widgets.kbd import Start, Cancel
 from aiogram_dialog.widgets.text import Const, Format, List, Jinja
 
 from hustler_bracelet.bot.dialogs import states
-from hustler_bracelet.bot.utils.lang_utils import choose_plural_form
+from hustler_bracelet.bot.utils.lang_utils import plural_form
 from hustler_bracelet.managers import FinanceManager
 from hustler_bracelet.database.task import Task
 
@@ -42,15 +42,15 @@ def get_planning_data_getter(*, include_other_days: bool = True):
         return {
             'tasks': {
                 f'📝 {tasks_for_today_amount} '
-                f'{choose_plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
+                f'{plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
                 f'на сегодня': (tasks_for_today, '📝 На сегодня нет задач'),
 
-                f'🕐 и ещё {tasks_for_tomorrow_amount} '
-                f'{choose_plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))} '
-                f'на завтра': (tasks_for_tomorrow, '🕐 На завтра нет задач'),
+                f'🕐 на завтра '
+                f'{plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))}'
+                : (tasks_for_tomorrow, '🕐 На завтра нет задач'),
 
                 **{
-                    f'📆 {len(tasks_for_this_date)} задач на {date_}': (tasks_for_this_date, '') for date_, tasks_for_this_date in other_tasks_sorted.items()
+                    f'📆 {plural_form(len(tasks_for_this_date), ("задача", "задачи", "задач"))} на {date_}': (tasks_for_this_date, '') for date_, tasks_for_this_date in other_tasks_sorted.items()
                 },
             },
             'today_uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks_filtered_by_planned_complete_date(
@@ -91,10 +91,10 @@ planning_main_menu_dialog = Dialog(
         get_jinja_widget_for_tasks_displaying(),
         Jinja(
             '{% if uncompleted_tasks_amount > 0 %}\n'
-            '💪 У тебя {{ uncompleted_tasks_amount }} задач к выполнению. Поворкаем?\n'
+            '💪 У тебя {{ uncompleted_tasks_amount|plural(["задача", "задачи", "задач"]) }} к выполнению. Поворкаем?\n'
             '{% endif %}\n'
             '{% if completed_tasks_amount > 0 %}\n'
-            '📊 Ты закрыл уже {{ completed_tasks_amount }} задач. Неплохо!\n'
+            '📊 Ты закрыл уже {{ completed_tasks_amount|plural(["задача", "задачи", "задач"]) }}. Неплохо!\n'
             '{% endif %}'
         ),
         Start(

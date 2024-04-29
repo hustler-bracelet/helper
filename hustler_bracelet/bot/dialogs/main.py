@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from aiogram_dialog import Dialog, LaunchMode, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Start, Row, Button
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Const, Format, Jinja
 
 from . import states
 from .finance.add_event import on_start_add_event_dialog_click
@@ -24,12 +24,13 @@ async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
 
 main_dialog = Dialog(
     Window(
-        Format(
+        Jinja(
             '👋 <b>Привет, хаслер!</b>\n'
             'Вот твоя сводка на сегодня:\n'
             '\n'
             '💵 <b>Твой капитал:</b> {balance}\n'
-            '• Сегодня было {incomes_amount} прихода и {spends_amount} расходов'  # TODO: добавить склонение "прихода" и "расходов"'
+            '• Сегодня было {{ incomes_amount|plural(["приход", "прихода", "приходов"]) }} '
+            'и {{ incomes_amount|plural(["расход", "расхода", "расходов"]) }}'
         ),
         get_jinja_widget_for_tasks_displaying(),
         Button(

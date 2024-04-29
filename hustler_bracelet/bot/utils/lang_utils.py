@@ -1,5 +1,5 @@
-import locale
 import datetime
+from typing import Callable
 
 from aiogram_dialog import DialogManager
 
@@ -77,7 +77,7 @@ async def formatted_event_value_getter(dialog_manager: DialogManager, **kwargs):
     }
 
 
-def choose_plural_form(number: int, titles: tuple[str, ...] | list[str]):
+def plural_form(number: int, titles: tuple[str, ...] | list[str]):
     """
     :param number:
     :param titles: 1 Минута, 2 минуты, 0 минут
@@ -92,7 +92,7 @@ def choose_plural_form(number: int, titles: tuple[str, ...] | list[str]):
     else:
         idx = cases[5]
 
-    return titles[idx]
+    return f'{number} {titles[idx]}'
 
 
 def represent_date(date: datetime.date) -> str:
@@ -100,9 +100,16 @@ def represent_date(date: datetime.date) -> str:
 
     today = datetime.date.today()
 
-    date_representation = f'{date.day} {months[date.month-1]}'
+    date_representation = f'{date.day} {months[date.month - 1]}'
 
     if date.year != today.year:
         date_representation += f' {date.year}'
 
     return date_representation
+
+
+def get_jinja_filters() -> dict[str, Callable[..., str]]:
+    return {
+        'plural': plural_form,
+        'represent_date': represent_date
+    }
