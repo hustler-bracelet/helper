@@ -1,18 +1,16 @@
 import asyncio
 import logging
-from typing import Callable, Any, Awaitable
 
-from aiogram import Bot, Dispatcher, F, Router, types
+import aiogram_dialog
+from aiogram import Bot, Dispatcher, F, Router
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove, Update
+from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove
 from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
 from aiogram_dialog.widgets.text import setup_jinja
-from sqlmodel.ext.asyncio.session import AsyncSession
-import aiogram_dialog
 
 import config
 from hustler_bracelet.bot.dialogs.finance import finance_menu_dialog
@@ -22,16 +20,15 @@ from hustler_bracelet.bot.dialogs.finance.categories_management.add_category imp
 from hustler_bracelet.bot.dialogs.finance.categories_management.delete_category import delete_finance_category_dialog
 from hustler_bracelet.bot.dialogs.main import main_dialog
 from hustler_bracelet.bot.dialogs.onboarding import onboarding_dialog
-from hustler_bracelet.bot.dialogs.settings import settings_main_menu_dialog
-from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
-from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
 from hustler_bracelet.bot.dialogs.planning.add_task import add_task_dialog
 from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
+from hustler_bracelet.bot.dialogs.settings import settings_main_menu_dialog
+from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
+from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
+from hustler_bracelet.bot.filters import SubChecker
+from hustler_bracelet.bot.middlewares import database_middleware
 from hustler_bracelet.bot.utils.lang_utils import get_jinja_filters
-from hustler_bracelet.database.engine import DATABASE_ENGINE
-from hustler_bracelet.managers.finance_manager import FinanceManager
-from hustler_bracelet.managers.user_manager import UserManager
 from .dialogs import states
 
 
@@ -97,28 +94,10 @@ def setup_dp():
         on_unknown_intent,
         ExceptionTypeFilter(UnknownIntent),
     )
+    dp.message.filter(SubChecker())
     dp.include_router(dialog_router)
     setup_dialogs(dp)
     return dp
-
-
-async def database_middleware(
-        handler: Callable[[Update, dict[str, Any]], Awaitable[Any]],
-        event: Update,
-        data: dict[str, Any]
-) -> Any:
-    familiar_event: types.Message | types.CallbackQuery = event.message or event.callback_query
-
-    if familiar_event:
-        data['user_manager'] = user_manager = UserManager(familiar_event.from_user.id, AsyncSession(DATABASE_ENGINE))
-        data['finance_manager'] = FinanceManager(user_manager)
-
-        async with user_manager:
-            data['user_created'] = await user_manager.create_user_if_not_exists(familiar_event.from_user.first_name)
-            return await handler(event, data)
-    else:
-        print(f'Some strange event: {event}')
-        return await handler(event, data)
 
 
 async def main():
@@ -129,7 +108,8 @@ async def main():
 
     aiogram_dialog.widgets.text.jinja.default_env = setup_jinja(dp, filters=get_jinja_filters())
 
-    dp.update.outer_middleware.register(database_middleware)
+    dp.message.middleware.register(database_middleware)
+    dp.callback_query.middleware.register(database_middleware)
 
     await dp.start_polling(bot)
 
