@@ -1,3 +1,6 @@
+import locale
+import datetime
+
 from aiogram_dialog import DialogManager
 
 from hustler_bracelet.bot.utils import get_event_type
@@ -90,3 +93,16 @@ def choose_plural_form(number: int, titles: tuple[str, ...] | list[str]):
         idx = cases[5]
 
     return titles[idx]
+
+
+def represent_date(date: datetime.date) -> str:
+    months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+
+    today = datetime.date.today()
+
+    date_representation = f'{date.day} {months[date.month-1]}'
+
+    if date.year != today.year:
+        date_representation += f' {date.year}'
+
+    return date_representation
