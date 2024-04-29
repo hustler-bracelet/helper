@@ -6,6 +6,7 @@ from aiogram_dialog.widgets.text import Const, Format
 
 from . import states
 from .finance.add_event import on_start_add_event_dialog_click
+from .planning import get_jinja_widget_for_tasks_displaying, get_planning_data_getter
 from ..utils.lang_utils import formatted_balance_getter
 from ...enums import FinanceTransactionType
 from ...managers.finance_manager import FinanceManager
@@ -48,8 +49,7 @@ async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
     return {
         **await formatted_balance_getter(dialog_manager, **kwargs),
         'incomes_amount': await finance_manager.get_events_amount(FinanceTransactionType.INCOME),
-        'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING),
-        'tasks_text': await get_tasks_for_today_and_tomorrow()
+        'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING)
     }
 
 
@@ -60,25 +60,9 @@ main_dialog = Dialog(
             'Вот твоя сводка на сегодня:\n'
             '\n'
             '💵 <b>Твой капитал:</b> {balance}\n'
-            '• Сегодня было {incomes_amount} прихода и {spends_amount} расходов\n'  # TODO: добавить склонение "прихода" и "расходов" 
-            '\n'
-            '{tasks_text}'
+            '• Сегодня было {incomes_amount} прихода и {spends_amount} расходов'  # TODO: добавить склонение "прихода" и "расходов"'
         ),
-        # Start(
-        #     text=Const("📐 Layout widgets"),
-        #     id="layout",
-        #     state=states.Layouts.MAIN,
-        # ),
-        # Start(
-        #     text=Const("📜 Scrolling widgets"),
-        #     id="scrolls",
-        #     state=states.Scrolls.MAIN,
-        # ),
-        # Start(
-        #     text=Const("☑️ Selection widgets"),
-        #     id="selects",
-        #     state=states.Selects.MAIN,
-        # ),
+        get_jinja_widget_for_tasks_displaying(),
         Button(
             text=Const('🤑 Добавить доход'),
             id='add_income',
@@ -137,7 +121,7 @@ main_dialog = Dialog(
         #     state=states.ReplyKeyboard.MAIN,
         # ),
         state=states.Main.MAIN,
-        getter=main_dialog_getter
+        getter=(main_dialog_getter, get_planning_data_getter(include_other_days=False)),
     ),
     launch_mode=LaunchMode.ROOT,
 )
