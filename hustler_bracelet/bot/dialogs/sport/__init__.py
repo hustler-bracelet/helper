@@ -6,8 +6,8 @@ from hustler_bracelet.bot.dialogs import states
 
 sport_main_menu_dialog = Dialog(
     Window(
-        Const('Пока что в разработке...'),
-        Cancel(Const('Ok')),
+        Const('Пока-что в разработке...'),
+        Cancel(Const('👌 Ок')),
         state=states.Sport.MAIN
     )
 )

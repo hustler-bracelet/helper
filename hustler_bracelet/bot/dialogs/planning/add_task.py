@@ -52,7 +52,7 @@ add_task_dialog = Dialog(
             id='enter_name_for_new_task',
             on_success=on_name_for_new_task_entered
         ),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.AddTask.MAIN
     ),
     Window(
@@ -69,7 +69,7 @@ add_task_dialog = Dialog(
             )
         ),
         Today(on_date_clicked),
-        Back(),
+        Back(Const('⬅️ Назад')),
         state=states.AddTask.GET_DATE
     ),
     Window(
@@ -78,7 +78,7 @@ add_task_dialog = Dialog(
             '\n'
             '✅ Задача “{dialog_data[name]}” на {dialog_data[date]} успешно добавлена.'
         ),
-        Cancel(Const('Ok')),
+        Cancel(Const('👌 Ок')),
         state=states.AddTask.FINAL
     )
 )

@@ -175,7 +175,7 @@ add_finance_event_dialog = Dialog(
         ),
         get_choose_category_kb(on_choose_category_click),
         Button(text=Const('➕ Создать новую категорию'), id='add_fin_category', on_click=on_add_category_click),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.AddFinanceEvent.MAIN,
         getter=category_choose_window_getter
     ),
@@ -191,7 +191,7 @@ add_finance_event_dialog = Dialog(
             on_error=process_incorrect_amount_for_new_event,
             type_factory=validate_amount_for_new_event
         ),
-        Back(),
+        Back(Const('⬅️ Назад')),
         state=states.AddFinanceEvent.ENTER_VALUE
     ),
     Window(
@@ -208,7 +208,7 @@ add_finance_event_dialog = Dialog(
             )
         ),
         Today(on_date_clicked),
-        Back(),
+        Back(Const('⬅️ Назад')),
 
         state=states.AddFinanceEvent.CHOOSE_DATE,
     ),
@@ -218,7 +218,7 @@ add_finance_event_dialog = Dialog(
             '\n'
             '✅ {capitalized_finance_event_name} {value} за {dialog_data[event_date]} успешно зарегистрирован.'  # TODO: Сделать красивый рендеринг для event_date и value
         ),
-        Cancel(Const('Ok')),
+        Cancel(Const('👌 Ок')),
         state=states.AddFinanceEvent.FINAL,
         getter=formatted_event_value_getter
     ),

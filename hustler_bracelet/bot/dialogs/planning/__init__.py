@@ -10,7 +10,7 @@ from hustler_bracelet.managers import FinanceManager
 from hustler_bracelet.database.task import Task
 
 
-def get_planning_data_getter(include_other_days: bool = True):
+def get_planning_data_getter(*, include_other_days: bool = True):
     async def wrapped(dialog_manager: DialogManager, **kwargs):
         finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
@@ -64,7 +64,23 @@ def get_planning_data_getter(include_other_days: bool = True):
             'uncompleted_tasks_amount': await finance_manager.get_amount_of_tasks(completed=False),
             'completed_tasks_amount': await finance_manager.get_amount_of_tasks(completed=True),
         }
+
     return wrapped
+
+
+def get_jinja_widget_for_tasks_displaying() -> Jinja:
+    return Jinja(
+        '{% for category, (tasks, text_for_empty_tasks) in tasks.items() %}'
+        '{% if tasks %}'
+        '<b>\n{{ category }}:</b>\n'
+        '{% for task in tasks %}'
+        ' •  {{ task.name }}\n'
+        '{% endfor %}'
+        '{% else %}'
+        '<b>\n{{ text_for_empty_tasks }}</b>\n'
+        '{% endif %}'
+        '{% endfor %}'
+    )
 
 
 planning_main_menu_dialog = Dialog(
@@ -72,18 +88,7 @@ planning_main_menu_dialog = Dialog(
         Const(
             '✅ <b>Планирование</b>'
         ),
-        Jinja(
-            '{% for category, (tasks, text_for_empty_tasks) in tasks.items() %}'
-            '{% if tasks %}'
-            '<b>\n{{ category }}:</b>\n'
-            '{% for task in tasks %}'
-            ' •  {{ task.name }}\n'
-            '{% endfor %}'
-            '{% else %}'
-            '<b>\n{{ text_for_empty_tasks }}</b>\n'
-            '{% endif %}'
-            '{% endfor %}'
-        ),
+        get_jinja_widget_for_tasks_displaying(),
         Jinja(
             '{% if uncompleted_tasks_amount > 0 %}\n'
             '💪 У тебя {{ uncompleted_tasks_amount }} задач к выполнению. Поворкаем?\n'
@@ -102,7 +107,7 @@ planning_main_menu_dialog = Dialog(
             id='complete_some_tasks',
             state=states.CompleteSomeTasks.MAIN
         ),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.Planning.MAIN,
         getter=get_planning_data_getter()
     )

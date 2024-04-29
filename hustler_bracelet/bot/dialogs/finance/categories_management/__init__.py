@@ -59,7 +59,7 @@ finance_categories_management_menu_dialog = Dialog(
                 state=states.AddFinanceCategory.MAIN
             ),
         ),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.FinanceCategoriesManagementMenu.MAIN,
         getter=finance_categories_management_menu_getter
     )

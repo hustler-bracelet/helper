@@ -72,7 +72,10 @@ add_finance_category_dialog = Dialog(
             'Введи название категории, от которой поступил {finance_event_name}, и я её создам'
         ),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
-        Cancel(result={'fucked_up_on_the_category_creating': True}),
+        Cancel(
+            Const('❌ Отмена'),
+               result={'fucked_up_on_the_category_creating': True}
+        ),
         state=states.AddFinanceCategory.ENTER_NAME_FROM_EVENT_ADDING,
         getter=finance_event_words_getter
     ),
@@ -83,7 +86,7 @@ add_finance_category_dialog = Dialog(
             'Какой тип будет иметь новая категория?'
         ),
         get_choose_category_type_kb(on_category_type_selected),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.AddFinanceCategory.MAIN
     ),
     Window(
@@ -93,7 +96,7 @@ add_finance_category_dialog = Dialog(
             'Какое имя будет у новой категории {finance_event_name}ов?'
         ),
         TextInput(id='name_for_new_cat', on_success=get_name_for_new_category),
-        Back(),
+        Back(Const('⬅️ Назад')),
         state=states.AddFinanceCategory.ENTER_NAME,
         getter=finance_event_words_getter
     ),
@@ -104,7 +107,7 @@ add_finance_category_dialog = Dialog(
             'Категория успешно добавлена'
         ),
         Button(
-            Const('Ok'),
+            Const('👌 Ок'),
             on_click=on_cancel_click,
             id='on_cancel_id_while_category_created'
         ),

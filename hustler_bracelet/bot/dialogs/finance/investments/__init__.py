@@ -51,7 +51,7 @@ investments_main_menu_dialog = Dialog(
                 state=NotImplemented
             ),
         ),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.FinanceInvestmentsMenu.MAIN
     )
 )

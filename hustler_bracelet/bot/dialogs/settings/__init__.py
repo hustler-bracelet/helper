@@ -26,7 +26,7 @@ settings_main_menu_dialog = Dialog(
             id='erase_all_data_about_user',
             state=states.EraseAllDataAboutUser.MAIN
         ),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.SettingsMainMenu.MAIN
     )
 )

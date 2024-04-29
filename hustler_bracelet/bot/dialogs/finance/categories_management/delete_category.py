@@ -55,7 +55,7 @@ delete_finance_category_dialog = Dialog(
             'Категорию какого типа ты хочешь удалить?'
         ),
         get_choose_category_type_kb(on_category_type_selected),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
         state=states.DeleteFinanceCategory.MAIN,
     ),
     Window(
@@ -65,7 +65,7 @@ delete_finance_category_dialog = Dialog(
             'Выбери категорию {finance_event_name}ов, котору хочешь удалить'
         ),
         get_choose_category_kb(on_choose_category_click),
-        Back(),
+        Back(Const('⬅️ Назад')),
         state=states.DeleteFinanceCategory.CHOOSE_CATEGORY,
         getter=(
             category_choose_window_getter,
@@ -78,7 +78,7 @@ delete_finance_category_dialog = Dialog(
             '\n'
             'Категория {finance_event_name}ов "{dialog_data[cat_name]}" успешно удалена'
         ),
-        Cancel(Const('Ok')),
+        Cancel(Const('👌 Ок')),
         state=states.DeleteFinanceCategory.FINAL,
         getter=finance_event_words_getter
     )

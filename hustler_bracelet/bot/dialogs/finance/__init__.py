@@ -58,7 +58,7 @@ finance_menu_dialog = Dialog(
             id='investments_management_menu',
             state=states.FinanceInvestmentsMenu.MAIN
         ),
-        Cancel(),
+        Cancel(Const('❌ Отмена')),
 
         state=states.FinanceMainMenu.MAIN,
         getter=formatted_balance_getter

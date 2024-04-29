@@ -26,7 +26,7 @@ about_bot_dialog = Dialog(
             f'и {html.link("aiogram_dialog", link="https://github.com/Tishka17/aiogram_dialog")} (by Tishka17).'
         ),
         about_aiogram_dialog_button(),
-        Cancel(Const('Ok')),
+        Cancel(Const('👌 Ок')),
         state=states.AboutBot.MAIN
     )
 )

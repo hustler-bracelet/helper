@@ -15,37 +15,6 @@ from ...managers.finance_manager import FinanceManager
 async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
-    async def get_tasks_for_today_and_tomorrow():
-        all_tasks = await finance_manager.get_active_tasks()
-        tasks_for_today = [
-            task for task in all_tasks if task.planned_complete_date == date.today()
-        ]
-        tasks_for_today_amount = len(tasks_for_today)
-
-        tasks_for_tomorrow = [
-            task for task in all_tasks if task.planned_complete_date == date.today() + timedelta(days=1)
-        ]
-        tasks_for_tomorrow_amount = len(tasks_for_tomorrow)
-
-        text = ''
-        if tasks_for_today_amount == 0:
-            text += '<b>📝 На сегодня у тебя нет задач.</b>\n\n'
-        else:
-            text += f'<b>📝 На сегодня у тебя {tasks_for_today_amount} задач:</b>\n'
-            for task in tasks_for_today:
-                text += f' •  {task.name}\n'
-            text += '\n'
-
-        if tasks_for_tomorrow_amount == 0:
-            text += '<b>🕐 На завтра у тебя нет задач.</b>\n\n'
-        else:
-            text += f'<b>🕐 И ещё {tasks_for_tomorrow_amount} задач на завтра:</b>\n'
-            for task in tasks_for_tomorrow:
-                text += f' •  {task.name}\n'
-            text += '\n'
-
-        return text
-
     return {
         **await formatted_balance_getter(dialog_manager, **kwargs),
         'incomes_amount': await finance_manager.get_events_amount(FinanceTransactionType.INCOME),
@@ -100,26 +69,6 @@ main_dialog = Dialog(
             id='setting_menu',
             state=states.SettingsMainMenu.MAIN
         ),
-        # Start(
-        #     text=Const("💯 Counter and Progress"),
-        #     id="counter",
-        #     state=states.Counter.MAIN,
-        # ),
-        # Start(
-        #     text=Const("🎛 Combining widgets"),
-        #     id="multiwidget",
-        #     state=states.Multiwidget.MAIN,
-        # ),
-        # Start(
-        #     text=Const("🔢 Multiple steps"),
-        #     id="switch",
-        #     state=states.Switch.MAIN,
-        # ),
-        # Start(
-        #     text=Const("⌨️ Reply keyboard"),
-        #     id="reply",
-        #     state=states.ReplyKeyboard.MAIN,
-        # ),
         state=states.Main.MAIN,
         getter=(main_dialog_getter, get_planning_data_getter(include_other_days=False)),
     ),
