@@ -263,7 +263,7 @@ class FinanceManager:
 
         return tasks
 
-    async def get_most_profitable_income_category(self) -> tuple[Category, str]:
+    async def get_most_profitable_income_category(self) -> tuple[Category, float]:
         category_to_income_map: dict[Category, float] = {}
 
         for category in await self.get_all_categories(FinanceTransactionType.INCOME):
@@ -278,11 +278,10 @@ class FinanceManager:
         )
 
         category_and_income = categories_sorted_by_income[0]
-        formatted_income = format_money_amount(category_and_income[1])
 
-        return category_and_income[0], formatted_income
+        return category_and_income[0], category_and_income[1]
 
-    async def get_most_spending_category(self) -> tuple[Category, str]:
+    async def get_most_spending_category(self) -> tuple[Category, float]:
         category_to_spendings: dict[Category, float] = {}
 
         for category in await self.get_all_categories(FinanceTransactionType.SPENDING):
@@ -297,9 +296,8 @@ class FinanceManager:
         )
 
         category_and_spendings = categories_sorted_by_spendings[0]
-        formatted_spendings = format_money_amount(category_and_spendings[1])
 
-        return category_and_spendings[0], formatted_spendings
+        return category_and_spendings[0], category_and_spendings[1]
 
     async def get_stats_for_time_range(
             self,

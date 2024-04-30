@@ -49,8 +49,10 @@ async def finance_event_words_getter(dialog_manager: DialogManager, **kwargs):
 
 
 def format_money_amount(money_amount: float) -> str:
-    if money_amount.is_integer():
-        money_amount = int(money_amount)
+    if not isinstance(money_amount, int):
+        if money_amount.is_integer():
+            money_amount = int(money_amount)
+
     spaced_money_amount = f'{money_amount:_}'.replace('_', ' ')  # КОСТЫЛИ ЕБУЧИЕ
 
     return f'{spaced_money_amount}₽'
