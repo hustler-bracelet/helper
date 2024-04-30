@@ -7,7 +7,6 @@ from aiogram_dialog.widgets.text import Const, Format, Jinja
 from . import states
 from .finance.add_event import on_start_add_event_dialog_click
 from .planning import get_jinja_widget_for_tasks_displaying, get_planning_data_getter
-from ..utils.lang_utils import balance_getter
 from ...enums import FinanceTransactionType
 from ...managers.finance_manager import FinanceManager
 
@@ -16,7 +15,7 @@ async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
     finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
 
     return {
-        **await balance_getter(dialog_manager, **kwargs),
+        'balance': await finance_manager.get_balance(),
         'incomes_amount': await finance_manager.get_events_amount(FinanceTransactionType.INCOME),
         'spends_amount': await finance_manager.get_events_amount(FinanceTransactionType.SPENDING)
     }

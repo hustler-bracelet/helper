@@ -2,13 +2,14 @@
 
 import random
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Sequence, NoReturn
 
 from sqlalchemy import delete
 from sqlalchemy.sql.functions import func
 from sqlmodel import select
 
+from hustler_bracelet.bot.utils.lang_utils import format_money_amount
 from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
@@ -132,7 +133,7 @@ class FinanceManager:
         await self._session.commit()
 
     async def get_sum_of_finance_transactions_of_category(self, category: Category) -> float:
-        sum = (
+        finance_transactions_sum = (
             await self._session.exec(
                 select(func.sum(FinanceTransaction.value)).where(
                     FinanceTransaction.category == category.id
@@ -140,7 +141,7 @@ class FinanceManager:
             )
         ).one()
 
-        return sum or 0.
+        return finance_transactions_sum or 0.
 
     async def get_category_by_id(self, id_: int) -> Category | NoReturn:
         category = (await self._session.exec(select(Category).where(Category.id == id_))).first()
@@ -216,7 +217,6 @@ class FinanceManager:
         return amount
 
     async def get_amount_of_tasks(self, *, completed: bool | None):
-
         query = select(func.count(Task.id)).where(
             Task.telegram_id == self._user_manager.telegram_id
         )
@@ -262,3 +262,58 @@ class FinanceManager:
         tasks = (await self._session.exec(query)).all()
 
         return tasks
+
+    async def get_most_profitable_income_category(self) -> tuple[Category, str]:
+        category_to_income_map: dict[Category, float] = {}
+
+        for category in await self.get_all_categories(FinanceTransactionType.INCOME):
+            category_name = await category.awaitable_attrs.name
+            category_total_income = await self.get_sum_of_finance_transactions_of_category(category)
+            category_to_income_map[category_name] = category_total_income
+
+        categories_sorted_by_income = sorted(
+            category_to_income_map.items(),
+            key=lambda x: x[1]+1,
+            reverse=True
+        )
+
+        category_and_income = categories_sorted_by_income[0]
+        formatted_income = format_money_amount(category_and_income[1])
+
+        return category_and_income[0], formatted_income
+
+    async def get_most_spending_category(self) -> tuple[Category, str]:
+        category_to_spendings: dict[Category, float] = {}
+
+        for category in await self.get_all_categories(FinanceTransactionType.SPENDING):
+            category_name = await category.awaitable_attrs.name
+            category_total_spent = await self.get_sum_of_finance_transactions_of_category(category)
+            category_to_spendings[category_name] = category_total_spent
+
+        categories_sorted_by_spendings = sorted(
+            category_to_spendings.items(),
+            key=lambda x: x[1]+1,
+            reverse=True
+        )
+
+        category_and_spendings = categories_sorted_by_spendings[0]
+        formatted_spendings = format_money_amount(category_and_spendings[1])
+
+        return category_and_spendings[0], formatted_spendings
+
+    async def get_stats_for_time_range(
+            self,
+            type_: FinanceTransactionType,
+            until_date: timedelta
+    ) -> tuple[float, int]:
+        query = select(FinanceTransaction).where(
+            FinanceTransaction.telegram_id == self._user_manager.telegram_id,
+            (date.today() - FinanceTransaction.transaction_date) is until_date,
+            FinanceTransaction.type == type_
+        )
+        results = (await self._session.exec(query)).all()
+
+        summed_up_amount = sum([result.value for result in results])
+        operations_count = len(results)
+
+        return summed_up_amount, operations_count

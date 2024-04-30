@@ -5,7 +5,6 @@ from aiogram_dialog import DialogManager
 
 from hustler_bracelet.bot.utils import get_event_type
 from hustler_bracelet.enums import FinanceTransactionType
-from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
 def get_finance_event_type_name(finance_event_type: FinanceTransactionType):
@@ -55,16 +54,6 @@ def format_money_amount(money_amount: float) -> str:
     spaced_money_amount = f'{money_amount:_}'.replace('_', ' ')  # КОСТЫЛИ ЕБУЧИЕ
 
     return f'{spaced_money_amount}₽'
-
-
-async def balance_getter(dialog_manager: DialogManager, **kwargs):
-    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
-
-    balance = await finance_manager.get_balance()
-
-    return {
-        'balance': balance
-    }
 
 
 async def event_value_getter(dialog_manager: DialogManager, **kwargs):
