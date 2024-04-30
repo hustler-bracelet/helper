@@ -90,6 +90,7 @@ class AboutBot(StatesGroup):
 
 class EraseAllDataAboutUser(StatesGroup):
     MAIN = State()
+    FINAL = State()
 
 
 class OnBoarding(StatesGroup):

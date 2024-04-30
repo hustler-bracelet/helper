@@ -25,6 +25,7 @@ from hustler_bracelet.bot.dialogs.planning.add_task import add_task_dialog
 from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_some_tasks_dialog
 from hustler_bracelet.bot.dialogs.settings import settings_main_menu_dialog
 from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
+from hustler_bracelet.bot.dialogs.settings.erase_all_data_about_me import erase_all_data_about_me_dialog
 from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
 from hustler_bracelet.bot.filters import SubChecker
 from hustler_bracelet.bot.middlewares import database_middleware
@@ -71,6 +72,7 @@ dialog_router = Router()
 
 dialog_router.include_routers(
     onboarding_dialog,
+    erase_all_data_about_me_dialog,
     main_dialog,
     sport_main_menu_dialog,
     delete_finance_category_dialog,
