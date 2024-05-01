@@ -270,8 +270,6 @@ class FinanceManager:
             category_total_income = await self.get_sum_of_finance_transactions_of_category(category)
             category_to_income_map[category_name] = category_total_income
 
-        print('category_to_income_map', category_to_income_map)
-
         if not category_to_income_map:
             return ('Нет данных', 0)  # noqa
 
