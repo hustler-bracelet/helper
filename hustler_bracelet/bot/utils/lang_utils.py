@@ -48,14 +48,16 @@ async def finance_event_words_getter(dialog_manager: DialogManager, **kwargs):
     return {**words, **capitalized_words}
 
 
+def format_number(number: float) -> str:
+    if not isinstance(number, int):
+        if number.is_integer():
+            money_amount = int(number)
+
+    return f'{number:_}'.replace('_', ' ')  # КОСТЫЛИ ЕБУЧИЕ
+
+
 def format_money_amount(money_amount: float) -> str:
-    if not isinstance(money_amount, int):
-        if money_amount.is_integer():
-            money_amount = int(money_amount)
-
-    spaced_money_amount = f'{money_amount:_}'.replace('_', ' ')  # КОСТЫЛИ ЕБУЧИЕ
-
-    return f'{spaced_money_amount}₽'
+    return f'{format_number(money_amount)}₽'
 
 
 async def event_value_getter(dialog_manager: DialogManager, **kwargs):
@@ -102,5 +104,6 @@ def get_jinja_filters() -> dict[str, Callable[..., str]]:
     return {
         'plural': plural_form,
         'date': represent_date,
-        'money': format_money_amount
+        'money': format_money_amount,
+        'number': format_number
     }
