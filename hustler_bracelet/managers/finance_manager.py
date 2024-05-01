@@ -61,7 +61,7 @@ class FinanceManager:
                 FinanceTransaction.type == category_type
             )
         )).one()
-        return query_results
+        return query_results or 0
 
     async def get_categories_amount(self, category_type: FinanceTransactionType) -> int:
         query_results = (await self._session.exec(
@@ -70,7 +70,7 @@ class FinanceManager:
                 Category.type == category_type
             )
         )).one()
-        return query_results
+        return query_results or 0
 
     async def create_new_category(self, name: str, category_type: FinanceTransactionType) -> Category:
         # Check if this user already has categories with the same name and type
@@ -272,14 +272,12 @@ class FinanceManager:
             category_total_income = await self.get_sum_of_finance_transactions_of_category(category)
             category_to_income_map[category_name] = category_total_income
 
-        print('category_to_income_map', category_to_income_map)
-
         if not category_to_income_map:
             return ('Нет данных', 0)  # noqa
 
         categories_sorted_by_income = sorted(
             category_to_income_map.items(),
-            key=lambda x: x[1]+1,
+            key=lambda x: x[1] + 1,
             reverse=True
         )
 
@@ -300,7 +298,7 @@ class FinanceManager:
 
         categories_sorted_by_spendings = sorted(
             category_to_spendings.items(),
-            key=lambda x: x[1]+1,
+            key=lambda x: x[1] + 1,
             reverse=True
         )
 
@@ -365,3 +363,37 @@ class FinanceManager:
 
         await self._session.commit()
         return investment_transaction
+
+    async def erase_all_data_about_user(self, user_id: int):
+        await self._session.exec(
+            delete(FinanceTransaction)
+            .where(
+                FinanceTransaction.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(Category)
+            .where(
+                Category.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(Task)
+            .where(
+                Task.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(User)
+            .where(
+                User.telegram_id == user_id
+            )
+        )
+
+    async def get_users_amount(self):
+        query_results = (
+            await self._session.exec(
+                select(func.count(User.id))
+            )
+        ).one()
+        return query_results or 0
