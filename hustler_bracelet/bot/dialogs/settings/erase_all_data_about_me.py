@@ -13,7 +13,7 @@ async def on_sure_erase_all_data_about_me_click(
         manager: DialogManager
 ):
     finance_manager: FinanceManager = manager.middleware_data['finance_manager']
-    # TODO: Добавить удаление данных о пользователе
+    await finance_manager.erase_all_data_about_user(callback.from_user.id)
     await manager.next()
 
 
