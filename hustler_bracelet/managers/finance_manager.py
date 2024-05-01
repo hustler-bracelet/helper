@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import random
-
 from datetime import date, datetime, timedelta
 from typing import Sequence, NoReturn
 
@@ -9,7 +8,6 @@ from sqlalchemy import delete
 from sqlalchemy.sql.functions import func
 from sqlmodel import select
 
-from hustler_bracelet.bot.utils.lang_utils import format_money_amount
 from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
@@ -275,7 +273,7 @@ class FinanceManager:
 
         categories_sorted_by_income = sorted(
             category_to_income_map.items(),
-            key=lambda x: x[1]+1,
+            key=lambda x: x[1] + 1,
             reverse=True
         )
 
@@ -296,7 +294,7 @@ class FinanceManager:
 
         categories_sorted_by_spendings = sorted(
             category_to_spendings.items(),
-            key=lambda x: x[1]+1,
+            key=lambda x: x[1] + 1,
             reverse=True
         )
 
@@ -327,3 +325,29 @@ class FinanceManager:
         operations_count = len(results)
 
         return summed_up_amount, operations_count
+
+    async def erase_all_data_about_user(self, user_id: int):
+        await self._session.exec(
+            delete(FinanceTransaction)
+            .where(
+                FinanceTransaction.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(Category)
+            .where(
+                Category.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(Task)
+            .where(
+                Task.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(User)
+            .where(
+                User.telegram_id == user_id
+            )
+        )
