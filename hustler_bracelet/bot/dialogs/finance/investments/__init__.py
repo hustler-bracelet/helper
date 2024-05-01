@@ -27,7 +27,7 @@ async def investments_data_getter(dialog_manager: DialogManager, **kwargs):
     def calculate_percentage(a: float, b: float):
         try:
             return float(round(a/b * 100, 1))
-        except:
+        except ZeroDivisionError:
             return 0.0
 
     return {
@@ -53,8 +53,8 @@ def get_jinja_widget_for_assets_displaying() -> Jinja:
     return Jinja(
         '{% for name, details in assets.items() %}'
         ' •  <b>{{ name }}:</b> {{ details[0]|money }}'
-        '{% if details[1] is not none %} ({{ details[1]|number }}%, прибыль: {{ details[2]|money }})\n'
-        '{% else %} (прибыль: {{ details[2]|money }}₽)\n'
+        '{% if details[1] != 0 %} ({{ details[1]|number }}%, прибыль: {{ details[2]|money }})\n'
+        '{% else %} (прибыль: {{ details[2]|money }})\n'
         '{% endif %}'
         '{% endfor %}'
     )
