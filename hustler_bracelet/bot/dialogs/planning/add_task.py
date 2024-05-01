@@ -76,7 +76,7 @@ add_task_dialog = Dialog(
         Jinja(
             '➕ <b>Добавление задачи</b>\n'
             '\n'
-            '✅ Задача “{{ dialog_data[name] }}” на {{ dialog_data[date]|date }} успешно добавлена.'
+            '✅ Задача “{{ dialog_data[\'name\'] }}” на {{ dialog_data[\'date\']|date }} успешно добавлена.'
         ),
         Cancel(Const('👌 Ок')),
         state=states.AddTask.FINAL

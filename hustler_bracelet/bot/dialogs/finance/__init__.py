@@ -16,9 +16,31 @@ async def finance_menu_getter(dialog_manager: DialogManager, **kwargs):
     balance = await finance_manager.get_balance()
     mp_income_category_name, mp_income_category_balance = await finance_manager.get_most_profitable_income_category()
     mp_spendings_category_name, mp_spendings_category_balance = await finance_manager.get_most_spending_category()
+
     sua_income_today, oc_income_today = await finance_manager.get_stats_for_time_range(
         type_=FinanceTransactionType.INCOME,
-        until_date=timedelta(days=0)
+        until_date=timedelta(0)
+    )
+    sua_income_week, oc_income_week = await finance_manager.get_stats_for_time_range(
+        type_=FinanceTransactionType.INCOME,
+        until_date=timedelta(7)
+    )
+    sua_income_month, oc_income_month = await finance_manager.get_stats_for_time_range(
+        type_=FinanceTransactionType.INCOME,
+        until_date=timedelta(30)
+    )
+
+    sua_spendings_today, oc_spendings_today = await finance_manager.get_stats_for_time_range(
+        type_=FinanceTransactionType.SPENDING,
+        until_date=timedelta(0)
+    )
+    sua_spendings_week, oc_spendings_week = await finance_manager.get_stats_for_time_range(
+        type_=FinanceTransactionType.SPENDING,
+        until_date=timedelta(7)
+    )
+    sua_spendings_month, oc_spendings_month = await finance_manager.get_stats_for_time_range(
+        type_=FinanceTransactionType.SPENDING,
+        until_date=timedelta(30)
     )
 
     return {
@@ -27,9 +49,21 @@ async def finance_menu_getter(dialog_manager: DialogManager, **kwargs):
         'mp_income_category_balance': mp_income_category_balance,
         'mp_spendings_category_name': mp_spendings_category_name,
         'mp_spendings_category_balance': mp_spendings_category_balance,
+
         'sua_income_today': sua_income_today,
-        'oc_income_today': oc_income_today
-    }
+        'oc_income_today': oc_income_today,
+        'sua_income_week': sua_income_week,
+        'oc_income_week': oc_income_week,
+        'sua_income_month': sua_income_month,
+        'oc_income_month': oc_income_month,
+
+        'sua_spendings_today': sua_spendings_today,
+        'oc_spendings_today': oc_spendings_today,
+        'sua_spendings_week': sua_spendings_week,
+        'oc_spendings_week': oc_spendings_week,
+        'sua_spendings_month': sua_spendings_month,
+        'oc_spendings_month': oc_spendings_month
+    }  # TODO: what the fuck?
 
 
 finance_menu_dialog = Dialog(
@@ -42,14 +76,14 @@ finance_menu_dialog = Dialog(
             '💵 <b>Твой капитал:</b> {{ balance|money }}\n'
             '\n'
             '<b>↗ Доходы:</b>\n'
-            '<b>• За сегодня:</b> {{ sua_income_today|money }} ({{ oc_income_today }} операции)\n'
-            '<b>• За неделю:</b> 20 000₽ (5 операций)\n'
-            '<b>• За месяц:</b> 75 000₽ (27 операций)\n'
+            '<b>• За сегодня:</b> {{ sua_income_today|money }} ({{ oc_income_today }} операций)\n'
+            '<b>• За неделю:</b> {{ sua_income_week|money }} ({{ oc_income_week }} операций)\n'
+            '<b>• За месяц:</b> {{ sua_income_month|money }} ({{ oc_income_month }} операций)\n'
             '\n'
             '<b>↙️ Расходы:</b>\n' 
-            '<b>• За сегодня:</b> 0₽\n'
-            '<b>• За неделю:</b> 10 000₽ (1 операция)\n'
-            '<b>• За месяц:</b> 15 000₽ (2 операции)\n'
+            '<b>• За сегодня:</b> {{ sua_spendings_today|money }} ({{ oc_spendings_today }} операций)\n'
+            '<b>• За неделю:</b> {{ sua_spendings_week|money }} ({{ oc_spendings_week }} операций)\n'
+            '<b>• За месяц:</b> {{ sua_spendings_month|money }} ({{ oc_spendings_month }} операции)\n'
             '\n'
             '📈 <b>Твои активы:</b>\n'
             '<b>• Нак. счёт Тинькофф:</b> 215 000₽ (15%, прибыль: 15 000₽)\n'

@@ -29,6 +29,9 @@ def get_planning_data_getter(*, include_other_days: bool = True):
         if include_other_days:
             other_tasks_sorted = {}
             for task in all_tasks:
+                if task.planned_complete_date in [date.today(), date.today() + timedelta(days=1)]:
+                    continue
+
                 if task.planned_complete_date not in other_tasks_sorted.keys():
                     other_tasks_sorted[task.planned_complete_date] = []
                 other_tasks_sorted[task.planned_complete_date].append(task)
@@ -41,12 +44,11 @@ def get_planning_data_getter(*, include_other_days: bool = True):
 
         return {
             'tasks': {
-                f'📝 {tasks_for_today_amount} '
-                f'{plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
+                f'📝 {plural_form(tasks_for_today_amount, ("задача", "задачи", "задач"))} '
                 f'на сегодня': (tasks_for_today, '📝 На сегодня нет задач'),
 
-                f'🕐 на завтра '
-                f'{plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))}'
+                f'🕐 {plural_form(tasks_for_tomorrow_amount, ("задача", "задачи", "задач"))}'
+                ' на завтра'
                 : (tasks_for_tomorrow, '🕐 На завтра нет задач'),
 
                 **{

@@ -2,7 +2,7 @@
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import create_engine, SQLModel
 
-DATABASE_ENGINE = AsyncEngine(create_engine('sqlite+aiosqlite:///hustler_bracelet.sqlite', echo=True, future=True))
+DATABASE_ENGINE = AsyncEngine(create_engine('sqlite+aiosqlite:///hustler_bracelet.sqlite', future=True))
 
 
 async def create_all_tables() -> None:

@@ -86,6 +86,7 @@ def plural_form(number: int, titles: tuple[str, ...] | list[str], include_number
 
 
 def represent_date(date: datetime.date) -> str:
+    print(date)
     months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 
     today = datetime.date.today()

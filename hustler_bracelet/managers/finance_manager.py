@@ -271,13 +271,22 @@ class FinanceManager:
             category_total_income = await self.get_sum_of_finance_transactions_of_category(category)
             category_to_income_map[category_name] = category_total_income
 
+        print('category_to_income_map', category_to_income_map)
+
+        if not category_to_income_map:
+            return ('Нет данных', 0)  # noqa
+
         categories_sorted_by_income = sorted(
             category_to_income_map.items(),
             key=lambda x: x[1]+1,
             reverse=True
         )
 
+        print('categories_sorted_by_income', categories_sorted_by_income)
+
         category_and_income = categories_sorted_by_income[0]
+
+        print('category_and_income', category_and_income)
 
         return category_and_income[0], category_and_income[1]
 
@@ -289,13 +298,21 @@ class FinanceManager:
             category_total_spent = await self.get_sum_of_finance_transactions_of_category(category)
             category_to_spendings[category_name] = category_total_spent
 
+        print('category_to_spendings', category_to_spendings)
+
+        if not category_to_spendings:
+            return ('Нет данных', 0)  # noqa
+
         categories_sorted_by_spendings = sorted(
             category_to_spendings.items(),
             key=lambda x: x[1]+1,
             reverse=True
         )
+        print('categories_sorted_by_spendings', categories_sorted_by_spendings)
 
         category_and_spendings = categories_sorted_by_spendings[0]
+
+        print('category_and_spendings', category_and_spendings)
 
         return category_and_spendings[0], category_and_spendings[1]
 
@@ -306,10 +323,17 @@ class FinanceManager:
     ) -> tuple[float, int]:
         query = select(FinanceTransaction).where(
             FinanceTransaction.telegram_id == self._user_manager.telegram_id,
-            (date.today() - FinanceTransaction.transaction_date) is until_date,
             FinanceTransaction.type == type_
+            # (date.today() - FinanceTransaction.transaction_date) == until_date  # shit aint working
         )
         results = (await self._session.exec(query)).all()
+
+        real_results: list[FinanceTransaction] = []
+        for transaction in results:
+            if (date.today() - transaction.transaction_date) <= until_date:
+                real_results.append(transaction)
+
+        results = real_results
 
         summed_up_amount = sum([result.value for result in results])
         operations_count = len(results)

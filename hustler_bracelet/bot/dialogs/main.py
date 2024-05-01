@@ -29,7 +29,7 @@ main_dialog = Dialog(
             '\n'
             '💵 <b>Твой капитал:</b> {{ balance | money }}\n'
             '• Сегодня было {{ incomes_amount|plural(["приход", "прихода", "приходов"]) }} '
-            'и {{ incomes_amount|plural(["расход", "расхода", "расходов"]) }}'
+            'и {{ spends_amount|plural(["расход", "расхода", "расходов"]) }}'
         ),
         get_jinja_widget_for_tasks_displaying(),
         Button(
