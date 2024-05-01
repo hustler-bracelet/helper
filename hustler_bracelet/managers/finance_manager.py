@@ -391,7 +391,7 @@ class FinanceManager:
 
         user = (await self._session.exec(select(User).where(User.telegram_id == asset.telegram_id))).one()
 
-        user.current_balance -= asset.current_amount
+        user.current_balance = (await user.awaitable_attrs.current_balance) - asset.current_amount
 
         await self._session.exec(
             delete(InvestmentTransaction).where(
