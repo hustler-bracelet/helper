@@ -19,9 +19,14 @@ class UserManager:
         return self._session
 
     async def _is_user_exists(self):
-        query_result = (await self._session.exec(
-            select(User).where(User.telegram_id == self._telegram_id)
-        )).all()
+        query_result = (
+            await self._session.exec(
+                select(User)
+                .where(
+                    User.telegram_id == self._telegram_id
+                )
+            )
+        ).all()
         return bool(query_result)
 
     async def create_new_user(self, telegram_name: str):

@@ -91,14 +91,23 @@ dialog_router.include_routers(
 def setup_dp():
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
+
     dp.message.register(start, F.text == "/start")
     dp.errors.register(
         on_unknown_intent,
         ExceptionTypeFilter(UnknownIntent),
     )
+
+    dp.message.middleware.register(database_middleware)
+    dp.callback_query.middleware.register(database_middleware)
+    dp.errors.middleware.register(database_middleware)
+
     dp.message.filter(SubChecker())
+
     dp.include_router(dialog_router)
+
     setup_dialogs(dp)
+
     return dp
 
 
@@ -109,9 +118,6 @@ async def main():
     dp = setup_dp()
 
     aiogram_dialog.widgets.text.jinja.default_env = setup_jinja(dp, filters=get_jinja_filters())
-
-    dp.message.middleware.register(database_middleware)
-    dp.callback_query.middleware.register(database_middleware)
 
     await dp.start_polling(bot)
 

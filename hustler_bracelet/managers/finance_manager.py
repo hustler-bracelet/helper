@@ -41,7 +41,6 @@ class FinanceManager:
                 Category.type == category_type
             )
         )).all()
-        print(category_type)
         return query_results
 
     async def get_all_events(self, category_type: FinanceTransactionType) -> Sequence[FinanceTransaction]:
@@ -282,11 +281,7 @@ class FinanceManager:
             reverse=True
         )
 
-        print('categories_sorted_by_income', categories_sorted_by_income)
-
         category_and_income = categories_sorted_by_income[0]
-
-        print('category_and_income', category_and_income)
 
         return category_and_income[0], category_and_income[1]
 
@@ -298,8 +293,6 @@ class FinanceManager:
             category_total_spent = await self.get_sum_of_finance_transactions_of_category(category)
             category_to_spendings[category_name] = category_total_spent
 
-        print('category_to_spendings', category_to_spendings)
-
         if not category_to_spendings:
             return ('Нет данных', 0)  # noqa
 
@@ -308,11 +301,8 @@ class FinanceManager:
             key=lambda x: x[1]+1,
             reverse=True
         )
-        print('categories_sorted_by_spendings', categories_sorted_by_spendings)
 
         category_and_spendings = categories_sorted_by_spendings[0]
-
-        print('category_and_spendings', category_and_spendings)
 
         return category_and_spendings[0], category_and_spendings[1]
 
