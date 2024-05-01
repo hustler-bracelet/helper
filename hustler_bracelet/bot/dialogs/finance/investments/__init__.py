@@ -18,6 +18,15 @@ async def investments_data_getter(dialog_manager: DialogManager, **kwargs):
     assets: Sequence[Asset] = await finance_manager.get_all_assets()
     investment_transactions: Sequence[InvestmentTransaction] = await finance_manager.get_investment_transactions()
 
+    def get_asset_name_by_id(asset_id: int) -> str:
+        for asset in assets:
+            if asset.id == asset_id:
+                return asset.name
+        return '???'
+
+    def calculate_percentage(a: float, b: float):
+        return float(round(a/b * 100, 1))
+
     return {
         'assets': {
             asset.name:
@@ -25,12 +34,15 @@ async def investments_data_getter(dialog_manager: DialogManager, **kwargs):
             for asset in assets
         },
         'investment_transactions': {
-            investment_transaction.name:
+            get_asset_name_by_id(investment_transaction.asset_id):
                 (investment_transaction.added_on.date(), investment_transaction.value)
             for investment_transaction in investment_transactions
         },
-        'money_in_assets_amount': 0,
-        'money_in_assets_percent': 0,
+        'money_in_assets_amount': await finance_manager.get_all_money_in_assets(),
+        'money_in_assets_percent': calculate_percentage(
+            await finance_manager.get_all_money_in_assets(),
+            await finance_manager.get_balance()
+        ),
     }
 
 
@@ -38,7 +50,7 @@ def get_jinja_widget_for_assets_displaying() -> Jinja:
     return Jinja(
         '{% for name, details in assets.items() %}'
         ' •  <b>{{ name }}:</b> {{ details[0]|money }}'
-        '{% if details[1] is not None %} ({{ details[1]|number }}%, прибыль: {{ details[2]|money }})\n'
+        '{% if details[1] is not none %} ({{ details[1]|number }}%, прибыль: {{ details[2]|money }})\n'
         '{% else %} (прибыль: {{ details[2]|money }}₽)\n'
         '{% endif %}'
         '{% endfor %}'
@@ -56,7 +68,7 @@ def get_jinja_widget_for_investment_transactions_displaying() -> Jinja:
 investments_main_menu_dialog = Dialog(
     Window(
         Jinja(
-            '📊 <b>Инвестиции</b>\n'
+            '📊 <b>Инвестиции</b> (beta)\n'
             '\n'
             '💵 <b>Всего в активах:</b> {{ money_in_assets_amount|money }}\n'
             '🧮 Твой капитал на {{ money_in_assets_percent }}% состоит из активов\n'
@@ -65,37 +77,36 @@ investments_main_menu_dialog = Dialog(
         ),
         get_jinja_widget_for_assets_displaying(),
         Const(
-            '\n'
             '🕐 <b>История зачислений:</b>'
         ),
         get_jinja_widget_for_investment_transactions_displaying(),
         Start(
             Const('🤑 Добавить прибыль'),
             id='add_asset_income',
-            state=NotImplemented
+            state=states.AddInvestmentProfit.MAIN
         ),
         Row(
             Start(
                 Const('➕ Добавить актив'),
                 id='add_asset',
-                state=NotImplemented
+                state=states.AddFinanceAsset.MAIN
             ),
             Start(
                 Const('➖ Удалить актив'),
                 id='delete_asset',
-                state=NotImplemented
+                state=states.DeleteAssets.MAIN
             ),
         ),
         Row(
             Start(
                 Const('✏️ Переим. актив'),
                 id='rename_asset',
-                state=NotImplemented
+                state=states.RenameAsset.MAIN
             ),
             Start(
                 Const('🧮 Изменить % ставку'),
                 id='change_asset_percent',
-                state=NotImplemented
+                state=states.ChangeInterestRate.MAIN
             ),
         ),
         Cancel(Const('❌ Отмена')),

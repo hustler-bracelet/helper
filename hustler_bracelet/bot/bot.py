@@ -19,6 +19,11 @@ from hustler_bracelet.bot.dialogs.finance.categories_management import finance_c
 from hustler_bracelet.bot.dialogs.finance.categories_management.add_category import add_finance_category_dialog
 from hustler_bracelet.bot.dialogs.finance.categories_management.delete_category import delete_finance_category_dialog
 from hustler_bracelet.bot.dialogs.finance.investments import investments_main_menu_dialog
+from hustler_bracelet.bot.dialogs.finance.investments.add_asset import add_asset_dialog
+from hustler_bracelet.bot.dialogs.finance.investments.add_profit import add_profit_dialog
+from hustler_bracelet.bot.dialogs.finance.investments.change_interest_rate import change_interest_rate_dialog
+from hustler_bracelet.bot.dialogs.finance.investments.delete_asset import delete_assets_dialog
+from hustler_bracelet.bot.dialogs.finance.investments.rename_asset import rename_asset_dialog
 from hustler_bracelet.bot.dialogs.main import main_dialog
 from hustler_bracelet.bot.dialogs.onboarding import onboarding_dialog
 from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
@@ -87,6 +92,11 @@ dialog_router.include_routers(
     finance_categories_management_menu_dialog,
     add_finance_event_dialog,
     add_finance_category_dialog,
+    add_asset_dialog,
+    delete_assets_dialog,
+    add_profit_dialog,
+    rename_asset_dialog,
+    change_interest_rate_dialog
 )
 
 

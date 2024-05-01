@@ -40,7 +40,29 @@ class FinanceInvestmentsMenu(StatesGroup):
 
 class AddFinanceAsset(StatesGroup):
     MAIN = State()
-    PERCENT = State()
+    BASE_AMOUNT = State()
+    INTEREST_RATE = State()
+    FINAL = State()
+
+
+class DeleteAssets(StatesGroup):
+    MAIN = State()
+
+
+class RenameAsset(StatesGroup):
+    MAIN = State()
+    ENTER_NAME = State()
+
+
+class ChangeInterestRate(StatesGroup):
+    MAIN = State()
+    ENTER_INTEREST_RATE = State()
+
+
+class AddInvestmentProfit(StatesGroup):
+    MAIN = State()
+    PROFIT = State()
+    FINAL = State()
 
 
 class AddFinanceEvent(StatesGroup):

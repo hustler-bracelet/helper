@@ -340,16 +340,27 @@ class FinanceManager:
             telegram_id=self._user_manager.telegram_id,
             added_on=datetime.now(),
             name=name,
-            interest_rate=interest_rate,
-            base_amount=base_amount,
-            current_amount=base_amount
+            interest_rate=float(interest_rate),
+            base_amount=float(base_amount),
+            current_amount=float(base_amount)
         )
         self._session.add(asset)
+
+        user = (await self._session.exec(
+            select(User).where(User.telegram_id == self._user_manager.telegram_id)
+        )).first()
+        user.current_balance += float(base_amount)
+
         await self._session.commit()
 
         return asset
 
-    async def record_asset_profit(self, asset: Asset, profit: float) -> InvestmentTransaction:
+    async def record_asset_profit(self, asset: Asset | int, profit: float) -> InvestmentTransaction:
+        if isinstance(asset, int):
+            asset = (await self._session.exec(
+                select(Asset).where(Asset.id == asset)
+            )).first()
+
         investment_transaction = InvestmentTransaction(
             id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,
@@ -358,7 +369,11 @@ class FinanceManager:
             value=profit
         )
         self._session.add(investment_transaction)
-        asset.current_amount += profit
+        asset.current_amount += float(profit)
+        user = (await self._session.exec(
+            select(User).where(User.telegram_id == self._user_manager.telegram_id)
+        )).first()
+        user.current_balance += float(profit)
 
         await self._session.commit()
         return investment_transaction
@@ -368,17 +383,32 @@ class FinanceManager:
         assets = (await self._session.exec(query)).all()
         return assets
 
-    async def delete_asset(self, asset: Asset) -> None:
+    async def delete_asset(self, asset: Asset | int) -> None:
+        if isinstance(asset, int):
+            asset = (await self._session.exec(
+                select(Asset).where(Asset.id == asset)
+            )).first()
+
         await self._session.delete(asset)
         await self._session.commit()
         return
 
-    async def rename_asset(self, asset: Asset, new_name: str) -> Asset:
+    async def rename_asset(self, asset: Asset | int, new_name: str) -> Asset:
+        if isinstance(asset, int):
+            asset = (await self._session.exec(
+                select(Asset).where(Asset.id == asset)
+            )).first()
+
         asset.name = new_name
         await self._session.commit()
         return asset
 
-    async def change_interest_rate(self, asset: Asset, new_interest_rate: float) -> Asset:
+    async def change_interest_rate(self, asset: Asset | int, new_interest_rate: float) -> Asset:
+        if isinstance(asset, int):
+            asset = (await self._session.exec(
+                select(Asset).where(Asset.id == asset)
+            )).first()
+
         asset.interest_rate = new_interest_rate
         # Если будут автоматические начисления на основе сложного процента,
         # здесь нужно будет это предусмотреть
@@ -391,6 +421,14 @@ class FinanceManager:
         )
         investment_transactions = (await self._session.exec(query)).all()
         return investment_transactions
+
+    async def get_all_money_in_assets(self) -> float:
+        assets = await self.get_all_assets()
+        money = 0.0
+        for asset in assets:
+            money += await asset.awaitable_attrs.current_amount
+
+        return money
 
     async def erase_all_data_about_user(self, user_id: int):
         await self._session.exec(
@@ -417,6 +455,8 @@ class FinanceManager:
                 User.telegram_id == user_id
             )
         )
+        await self._session.commit()
+        return
 
     async def get_users_amount(self):
         query_results = (

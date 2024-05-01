@@ -49,6 +49,7 @@ async def finance_event_words_getter(dialog_manager: DialogManager, **kwargs):
 
 
 def format_number(number: float) -> str:
+    number = round(number, 1)
     if not isinstance(number, int):
         if number.is_integer():
             number = int(number)

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Sequence
 
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Row, Start, Cancel, Button
@@ -6,6 +7,7 @@ from aiogram_dialog.widgets.text import Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.add_event import on_start_add_event_dialog_click
+from hustler_bracelet.database.asset import Asset
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.finance_manager import FinanceManager
 
@@ -43,6 +45,8 @@ async def finance_menu_getter(dialog_manager: DialogManager, **kwargs):
         until_date=timedelta(30)
     )
 
+    assets: Sequence[Asset] = await finance_manager.get_all_assets()
+
     return {
         'balance': balance,
         'mp_income_category_name': mp_income_category_name,
@@ -62,7 +66,13 @@ async def finance_menu_getter(dialog_manager: DialogManager, **kwargs):
         'sua_spendings_week': sua_spendings_week,
         'oc_spendings_week': oc_spendings_week,
         'sua_spendings_month': sua_spendings_month,
-        'oc_spendings_month': oc_spendings_month
+        'oc_spendings_month': oc_spendings_month,
+
+        'assets': {
+            asset.name:
+                (asset.current_amount, asset.interest_rate, asset.current_amount - asset.base_amount)
+            for asset in assets
+        }
     }  # TODO: what the fuck?
 
 
@@ -86,7 +96,12 @@ finance_menu_dialog = Dialog(
             '<b>• За месяц:</b> {{ sua_spendings_month|money }} ({{ oc_spendings_month }} операции)\n'
             '\n'
             '📈 <b>Твои активы:</b>\n'
-            'Soon..\n'
+            '{% for name, details in assets.items() %}'
+            ' •  <b>{{ name }}:</b> {{ details[0]|money }}'
+            '{% if details[1] is not none %} ({{ details[1]|number }}%, прибыль: {{ details[2]|money }})\n'
+            '{% else %} (прибыль: {{ details[2]|money }}₽)\n'
+            '{% endif %}'
+            '{% endfor %}\n'
             '\n'
             '🤑 Самый большой доход у тебя в категории:\n'
             '<b>{{ mp_income_category_name}}</b> ({{ mp_income_category_balance|money }})\n'
@@ -112,7 +127,7 @@ finance_menu_dialog = Dialog(
             state=states.FinanceCategoriesManagementMenu.MAIN
         ),
         Start(
-            text=Const('📈 Инвестиции'),
+            text=Const('📈 Инвестиции β'),
             id='investments_management_menu',
             state=states.FinanceInvestmentsMenu.MAIN
         ),
