@@ -25,7 +25,10 @@ async def investments_data_getter(dialog_manager: DialogManager, **kwargs):
         return '???'
 
     def calculate_percentage(a: float, b: float):
-        return float(round(a/b * 100, 1))
+        try:
+            return float(round(a/b * 100, 1))
+        except:
+            return 0.0
 
     return {
         'assets': {
