@@ -393,7 +393,7 @@ class FinanceManager:
     async def get_users_amount(self):
         query_results = (
             await self._session.exec(
-                select(func.count(User.id))
+                select(func.count(User.telegram_id))
             )
         ).one()
         return query_results or 0
