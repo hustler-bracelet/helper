@@ -38,6 +38,11 @@ class FinanceInvestmentsMenu(StatesGroup):
     MAIN = State()
 
 
+class AddFinanceAsset(StatesGroup):
+    MAIN = State()
+    PERCENT = State()
+
+
 class AddFinanceEvent(StatesGroup):
     MAIN = State()
     ENTER_VALUE = State()

@@ -18,6 +18,7 @@ from hustler_bracelet.bot.dialogs.finance.add_event import add_finance_event_dia
 from hustler_bracelet.bot.dialogs.finance.categories_management import finance_categories_management_menu_dialog
 from hustler_bracelet.bot.dialogs.finance.categories_management.add_category import add_finance_category_dialog
 from hustler_bracelet.bot.dialogs.finance.categories_management.delete_category import delete_finance_category_dialog
+from hustler_bracelet.bot.dialogs.finance.investments import investments_main_menu_dialog
 from hustler_bracelet.bot.dialogs.main import main_dialog
 from hustler_bracelet.bot.dialogs.onboarding import onboarding_dialog
 from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
@@ -71,6 +72,7 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 dialog_router = Router()
 
 dialog_router.include_routers(
+    investments_main_menu_dialog,
     onboarding_dialog,
     erase_all_data_about_me_dialog,
     main_dialog,

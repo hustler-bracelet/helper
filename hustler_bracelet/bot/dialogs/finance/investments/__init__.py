@@ -1,23 +1,74 @@
-from aiogram_dialog import Dialog, Window
+from datetime import timedelta, date
+from typing import Sequence
+
+from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Start, Row, Cancel
-from aiogram_dialog.widgets.text import Format, Const
+from aiogram_dialog.widgets.text import Format, Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.utils.lang_utils import plural_form, represent_date
+from hustler_bracelet.database.asset import Asset
+from hustler_bracelet.database.investment_transaction import InvestmentTransaction
+from hustler_bracelet.managers import FinanceManager
+
+
+async def investments_data_getter(dialog_manager: DialogManager, **kwargs):
+    finance_manager: FinanceManager = dialog_manager.middleware_data['finance_manager']
+
+    assets: Sequence[Asset] = await finance_manager.get_all_assets()
+    investment_transactions: Sequence[InvestmentTransaction] = await finance_manager.get_investment_transactions()
+
+    return {
+        'assets': {
+            asset.name:
+                (asset.current_amount, asset.interest_rate, asset.current_amount - asset.base_amount)
+            for asset in assets
+        },
+        'investment_transactions': {
+            investment_transaction.name:
+                (investment_transaction.added_on.date(), investment_transaction.value)
+            for investment_transaction in investment_transactions
+        },
+        'money_in_assets_amount': 0,
+        'money_in_assets_percent': 0,
+    }
+
+
+def get_jinja_widget_for_assets_displaying() -> Jinja:
+    return Jinja(
+        '{% for name, details in assets.items() %}'
+        ' •  <b>{{ name }}:</b> {{ details[0]|money }}'
+        '{% if details[1] is not None %} ({{ details[1]|number }}%, прибыль: {{ details[2]|money }})\n'
+        '{% else %} (прибыль: {{ details[2]|money }}₽)\n'
+        '{% endif %}'
+        '{% endfor %}'
+    )
+
+
+def get_jinja_widget_for_investment_transactions_displaying() -> Jinja:
+    return Jinja(
+        '{% for name, (date, value) in investment_transactions.items() %}\n'
+        ' •  {{ date|date }} + {{ value|money }} по активу {{ name }}\n'
+        '{% endfor %}'
+    )
+
 
 investments_main_menu_dialog = Dialog(
     Window(
-        Format(
+        Jinja(
             '📊 <b>Инвестиции</b>\n'
             '\n'
-            '💵 <b>Всего в активах:</b> Soon..\n'
-            '🧮 Твой капитал на Soon..% состоит из активов\n'
+            '💵 <b>Всего в активах:</b> {{ money_in_assets_amount|money }}\n'
+            '🧮 Твой капитал на {{ money_in_assets_percent }}% состоит из активов\n'
             '\n'
-            '📈 <b>Твои активы:</b>\n'
-            ' •  Soon..\n'
-            '\n'
-            '🕐 <b>История зачислений:<b>\n'
-            'Soon..\n'
+            '📈 <b>Твои активы:</b>'
         ),
+        get_jinja_widget_for_assets_displaying(),
+        Const(
+            '\n'
+            '🕐 <b>История зачислений:</b>'
+        ),
+        get_jinja_widget_for_investment_transactions_displaying(),
         Start(
             Const('🤑 Добавить прибыль'),
             id='add_asset_income',
@@ -48,6 +99,7 @@ investments_main_menu_dialog = Dialog(
             ),
         ),
         Cancel(Const('❌ Отмена')),
-        state=states.FinanceInvestmentsMenu.MAIN
+        state=states.FinanceInvestmentsMenu.MAIN,
+        getter=investments_data_getter,
     )
 )
