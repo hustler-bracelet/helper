@@ -10,9 +10,11 @@ from sqlalchemy.sql.functions import func
 from sqlmodel import select
 
 from hustler_bracelet.bot.utils.lang_utils import format_money_amount
+from hustler_bracelet.database.asset import Asset
 from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
+from hustler_bracelet.database.investment_transaction import InvestmentTransaction
 from hustler_bracelet.database.task import Task
 from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
@@ -329,3 +331,37 @@ class FinanceManager:
         operations_count = len(results)
 
         return summed_up_amount, operations_count
+
+    async def add_asset(
+            self,
+            name: str,
+            base_amount: float,
+            interest_rate: float = 0.0
+    ) -> Asset:
+        asset = Asset(
+            id=create_int_uid(),
+            telegram_id=self._user_manager.telegram_id,
+            added_on=datetime.now(),
+            name=name,
+            interest_rate=interest_rate,
+            base_amount=base_amount,
+            current_amount=base_amount
+        )
+        self._session.add(asset)
+        await self._session.commit()
+
+        return asset
+
+    async def record_asset_profit(self, asset: Asset, profit: float) -> InvestmentTransaction:
+        investment_transaction = InvestmentTransaction(
+            id=create_int_uid(),
+            telegram_id=self._user_manager.telegram_id,
+            added_on=datetime.now(),
+            asset_id=asset.id,
+            value=profit
+        )
+        self._session.add(investment_transaction)
+        asset.current_amount += profit
+
+        await self._session.commit()
+        return investment_transaction
