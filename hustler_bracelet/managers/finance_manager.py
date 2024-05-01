@@ -385,6 +385,13 @@ class FinanceManager:
         await self._session.commit()
         return asset
 
+    async def get_investment_transactions(self) -> Sequence[InvestmentTransaction]:
+        query = select(InvestmentTransaction).where(
+            InvestmentTransaction.telegram_id == self._user_manager.telegram_id
+        )
+        investment_transactions = (await self._session.exec(query)).all()
+        return investment_transactions
+
     async def erase_all_data_about_user(self, user_id: int):
         await self._session.exec(
             delete(FinanceTransaction)
