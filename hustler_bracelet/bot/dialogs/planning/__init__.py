@@ -40,7 +40,7 @@ def get_planning_data_getter(*, include_other_days: bool = True):
         else:
             other_tasks_sorted = {}
 
-        other_tasks_sorted: dict[represent_date, list[Task]]
+        other_tasks_sorted: dict[date, list[Task]]
 
         return {
             'tasks': {
