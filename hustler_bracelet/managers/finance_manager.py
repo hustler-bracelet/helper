@@ -389,9 +389,19 @@ class FinanceManager:
                 select(Asset).where(Asset.id == asset)
             )).first()
 
+        user = (await self._session.exec(select(User).where(User.telegram_id == asset.telegram_id))).one()
+
+        user.current_balance -= asset.current_amount
+
+        await self._session.exec(
+            delete(InvestmentTransaction).where(
+                InvestmentTransaction.asset_id == asset.id
+            )
+        )
+
         await self._session.delete(asset)
+
         await self._session.commit()
-        return
 
     async def rename_asset(self, asset: Asset | int, new_name: str) -> Asset:
         if isinstance(asset, int):
@@ -455,8 +465,19 @@ class FinanceManager:
                 User.telegram_id == user_id
             )
         )
+        await self._session.exec(
+            delete(Asset)
+            .where(
+                Asset.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(InvestmentTransaction)
+            .where(
+                InvestmentTransaction.telegram_id == user_id
+            )
+        )
         await self._session.commit()
-        return
 
     async def get_users_amount(self):
         query_results = (
