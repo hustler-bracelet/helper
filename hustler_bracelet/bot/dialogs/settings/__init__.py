@@ -8,14 +8,14 @@ settings_main_menu_dialog = Dialog(
     Window(
         Const(
             '⚙️ <b>Настройки</b>\n'
-            '\n'
-            '<b>Валюта:</b> рубли'
+            # '\n'
+            # '<b>Валюта:</b> рубли'
         ),
-        Start(
-            Const('Изменить: Валюта'),
-            id='change_currency_setting',
-            state=states.ChangeCurrencySetting.MAIN
-        ),
+        # Start(
+        #     Const('Изменить: Валюта'),
+        #     id='change_currency_setting',
+        #     state=states.ChangeCurrencySetting.MAIN
+        # ),
         Start(
             Const('ℹ️ О боте'),
             id='about_bot',
