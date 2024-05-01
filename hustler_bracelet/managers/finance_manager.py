@@ -5,9 +5,8 @@ import random
 from datetime import date, datetime, timedelta
 from typing import Sequence, NoReturn
 
-from sqlalchemy import delete
 from sqlalchemy.sql.functions import func
-from sqlmodel import select
+from sqlmodel import select, delete
 
 from hustler_bracelet.bot.utils.lang_utils import format_money_amount
 from hustler_bracelet.database.asset import Asset
@@ -363,6 +362,28 @@ class FinanceManager:
 
         await self._session.commit()
         return investment_transaction
+
+    async def get_all_assets(self) -> Sequence[Asset]:
+        query = select(Asset).where(Asset.telegram_id == self._user_manager.telegram_id)
+        assets = (await self._session.exec(query)).all()
+        return assets
+
+    async def delete_asset(self, asset: Asset) -> None:
+        await self._session.delete(asset)
+        await self._session.commit()
+        return
+
+    async def rename_asset(self, asset: Asset, new_name: str) -> Asset:
+        asset.name = new_name
+        await self._session.commit()
+        return asset
+
+    async def change_interest_rate(self, asset: Asset, new_interest_rate: float) -> Asset:
+        asset.interest_rate = new_interest_rate
+        # Если будут автоматические начисления на основе сложного процента,
+        # здесь нужно будет это предусмотреть
+        await self._session.commit()
+        return asset
 
     async def erase_all_data_about_user(self, user_id: int):
         await self._session.exec(
