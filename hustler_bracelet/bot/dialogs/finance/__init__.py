@@ -110,15 +110,17 @@ finance_menu_dialog = Dialog(
             '<b>{{ mp_spendings_category_name }}</b> ({{ mp_spendings_category_balance|money }})\n'
         ),
         Row(
-            Button(
+            Start(
                 text=Const('🤑 Добавить доход'),
                 id='add_income',
-                on_click=on_start_add_event_dialog_click(FinanceTransactionType.INCOME)
+                state=states.AddFinanceEvent.MAIN,
+                data={'event_type': FinanceTransactionType.INCOME}
             ),
-            Button(
+            Start(
                 text=Const('💳 Добавить расход'),
                 id='add_spend',
-                on_click=on_start_add_event_dialog_click(FinanceTransactionType.SPENDING)
+                state=states.AddFinanceEvent.MAIN,
+                data={'event_type': FinanceTransactionType.SPENDING},
             ),
         ),
         Start(

@@ -1,5 +1,4 @@
 import datetime
-import operator
 from datetime import date
 from typing import Any
 
@@ -8,51 +7,36 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
-    Calendar, ManagedCalendar, Button, ScrollingGroup, Back, CalendarConfig, Select, Cancel
+    Calendar, ManagedCalendar, Button, Back, CalendarConfig, Cancel
 )
 from aiogram_dialog.widgets.text import Const, Format, Jinja
 from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
-from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter
 from hustler_bracelet.bot.dialogs.widgets import Today
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter
 from hustler_bracelet.database.exceptions import CategoryNotFoundError
-from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.finance_manager import FinanceManager
 
 _evaluator = SimpleEval()
 
 
-def on_start_add_event_dialog_click(
-        event_type: FinanceTransactionType
-):
-    async def wrapped(
-            callback: types.CallbackQuery,
-            button: Button,
-            manager: DialogManager
-    ):
-        finance_manager: FinanceManager = manager.middleware_data['finance_manager']
-        categories_amount = await finance_manager.get_categories_amount(event_type)
+async def on_start_add_event_dialog_click(start_data: dict, manager: DialogManager):
+    event_type = start_data['event_type']
 
-        if categories_amount == 0:
-            await manager.start(
-                states.AddFinanceEvent.MAIN,
-                data={
-                    'event_type': event_type
-                }
-            )  # Чтобы после создания категории сразу включился этот диалог
-            await manager.start(
-                states.AddFinanceCategory.ENTER_NAME_FROM_EVENT_ADDING,
-                data={
-                    'cat_type': manager.start_data['event_type'],
-                    'force_done': True
-                }
-            )
-            return
-        await manager.start(states.AddFinanceEvent.MAIN, data={'event_type': event_type})
+    finance_manager: FinanceManager = manager.middleware_data['finance_manager']
+    categories_amount = await finance_manager.get_categories_amount(event_type)
 
-    return wrapped
+    if categories_amount == 0:
+        await manager.start(
+            states.AddFinanceCategory.ENTER_NAME_FROM_EVENT_ADDING,
+            data={
+                'cat_type': manager.start_data['event_type'],
+                'force_done': True
+            }
+        )
+        return
 
 
 async def on_date_clicked(
@@ -223,5 +207,6 @@ add_finance_event_dialog = Dialog(
         getter=event_value_getter
     ),
     getter=finance_event_words_getter,
-    on_process_result=on_process_result
+    on_process_result=on_process_result,
+    on_start=on_start_add_event_dialog_click
 )

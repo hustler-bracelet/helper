@@ -1,11 +1,9 @@
-from datetime import date, timedelta
-
 from aiogram_dialog import Dialog, LaunchMode, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Start, Row, Button
-from aiogram_dialog.widgets.text import Const, Format, Jinja
+from aiogram_dialog.widgets.kbd import Start, Row
+from aiogram_dialog.widgets.media import StaticMedia
+from aiogram_dialog.widgets.text import Const, Jinja
 
 from . import states
-from .finance.add_event import on_start_add_event_dialog_click
 from .planning import get_jinja_widget_for_tasks_displaying, get_planning_data_getter
 from ...enums import FinanceTransactionType
 from ...managers.finance_manager import FinanceManager
@@ -32,15 +30,17 @@ main_dialog = Dialog(
             'и {{ spends_amount|plural(["расход", "расхода", "расходов"]) }}'
         ),
         get_jinja_widget_for_tasks_displaying(),
-        Button(
+        Start(
             text=Const('🤑 Добавить доход'),
             id='add_income',
-            on_click=on_start_add_event_dialog_click(FinanceTransactionType.INCOME)
+            state=states.AddFinanceEvent.MAIN,
+            data={'event_type': FinanceTransactionType.INCOME}
         ),
-        Button(
+        Start(
             text=Const('💳 Добавить расход'),
             id='add_spend',
-            on_click=on_start_add_event_dialog_click(FinanceTransactionType.SPENDING)
+            state=states.AddFinanceEvent.MAIN,
+            data={'event_type': FinanceTransactionType.SPENDING},
         ),
         Start(
             text=Const('📝 Добавить задачу'),
