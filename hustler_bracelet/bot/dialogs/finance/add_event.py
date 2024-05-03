@@ -187,9 +187,9 @@ add_finance_event_dialog = Dialog(
         Calendar(
             id='fin_calendar',
             on_click=on_date_clicked,
-            config=CalendarConfig(
-                max_date=datetime.date.today()
-            )
+            # config=CalendarConfig(
+            #     max_date=datetime.date.today()
+            # )
         ),
         Today(on_date_clicked),
         Back(Const('⬅️ Назад')),
