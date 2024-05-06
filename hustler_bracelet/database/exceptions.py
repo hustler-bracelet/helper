@@ -17,3 +17,9 @@ class CategoryNotFoundError(DatabaseException):
 class TaskNotFoundError(DatabaseException):
     def __init__(self):
         super().__init__('Такой задачи не существует')
+
+
+class UserNotFoundError(DatabaseException):
+    def __init__(self):
+        super().__init__('Такого пользователя не существует')
+
