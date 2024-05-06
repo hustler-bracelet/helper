@@ -2,9 +2,12 @@ import datetime
 from typing import Callable
 
 from aiogram_dialog import DialogManager
+from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.utils import get_event_type
 from hustler_bracelet.enums import FinanceTransactionType
+
+_evaluator = SimpleEval()
 
 
 def get_finance_event_type_name(finance_event_type: FinanceTransactionType):
@@ -67,7 +70,7 @@ async def event_value_getter(dialog_manager: DialogManager, **kwargs):
     }
 
 
-def plural_form(number: int, titles: tuple[str, ...] | list[str], include_number: bool = True, do_format_number:bool = True):
+def plural_form(number: int, titles: tuple[str, ...] | list[str], include_number: bool = True, do_format_number: bool = True):
     """
     :param include_number:
     :param number:
@@ -101,6 +104,26 @@ def represent_date(date: datetime.date) -> str:
         date_representation += f' {date.year}'
 
     return date_representation
+
+
+def validate_number_with_math(text: str):
+    amount = text.lower()
+
+    replace_mapping = {
+        ' ': '',
+        ',': '.',
+        '^': '**',
+        ':': '/'
+    }
+    for old, new in replace_mapping.items():
+        amount = amount.replace(old, new)
+
+    try:
+        amount = _evaluator.eval(amount)
+    except BaseException:
+        raise ValueError('Кажется, ты ввёл неправильную формулу')
+
+    return amount
 
 
 def get_jinja_filters() -> dict[str, Callable[..., str]]:

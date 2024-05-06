@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 from datetime import date
 from typing import Any
 
@@ -7,19 +7,15 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
-    Calendar, ManagedCalendar, Button, Back, CalendarConfig, Cancel
+    Calendar, ManagedCalendar, Button, Back, Cancel
 )
 from aiogram_dialog.widgets.text import Const, Format, Jinja
-from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
 from hustler_bracelet.bot.dialogs.widgets import Today
-from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter
-from hustler_bracelet.database.exceptions import CategoryNotFoundError
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter, validate_number_with_math
 from hustler_bracelet.managers.finance_manager import FinanceManager
-
-_evaluator = SimpleEval()
 
 
 async def on_start_add_event_dialog_click(start_data: dict, manager: DialogManager):
@@ -114,26 +110,6 @@ async def process_incorrect_amount_for_new_event(
     await message.answer('\n'.join([*map(html.quote, error.args), 'Попробуй ещё раз']))
 
 
-def validate_amount_for_new_event(text: str):
-    amount = text.lower()
-
-    replace_mapping = {
-        ' ': '',
-        ',': '.',
-        '^': '**',
-        ':': '/'
-    }
-    for old, new in replace_mapping.items():
-        amount = amount.replace(old, new)
-
-    try:
-        amount = _evaluator.eval(amount)
-    except BaseException:
-        raise ValueError('Кажется, ты ввёл неправильную формулу')
-
-    return amount
-
-
 async def on_process_result(
         start_data: dict,
         result_data: dict,
@@ -170,7 +146,7 @@ add_finance_event_dialog = Dialog(
             id='amount_of_new_event',
             on_success=on_amount_for_new_event_entered,
             on_error=process_incorrect_amount_for_new_event,
-            type_factory=validate_amount_for_new_event
+            type_factory=validate_number_with_math
         ),
         Back(Const('⬅️ Назад')),
         state=states.AddFinanceEvent.ENTER_VALUE
