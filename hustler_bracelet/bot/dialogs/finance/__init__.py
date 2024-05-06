@@ -2,7 +2,7 @@ from datetime import timedelta
 from typing import Sequence
 
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Row, Start, Cancel, Button
+from aiogram_dialog.widgets.kbd import Row, Start, Cancel
 from aiogram_dialog.widgets.text import Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
@@ -73,27 +73,26 @@ async def finance_menu_getter(dialog_manager: DialogManager, **kwargs):
                 (asset.current_amount, asset.interest_rate, asset.current_amount - asset.base_amount)
             for asset in assets
         }
-    }  # TODO: what the fuck?
+    }
 
 
 finance_menu_dialog = Dialog(
     Window(
         Jinja(
-            # TODO: add plural
             '\n'
             '💸 <b>Финансы</b>\n'
             '\n'
             '💵 <b>Твой капитал:</b> {{ balance|money }}\n'
             '\n'
             '<b>↗ Доходы:</b>\n'
-            '<b>• За сегодня:</b> {{ sua_income_today|money }} ({{ oc_income_today }} операций)\n'
-            '<b>• За неделю:</b> {{ sua_income_week|money }} ({{ oc_income_week }} операций)\n'
-            '<b>• За месяц:</b> {{ sua_income_month|money }} ({{ oc_income_month }} операций)\n'
+            '<b>• За сегодня:</b> {{ sua_income_today|money }} ({{ oc_income_today|plural(["операция", "операции", "операций"]) }})\n'
+            '<b>• За неделю:</b> {{ sua_income_week|money }} ({{ oc_income_week|plural(["операция", "операции", "операций"]) }})\n'
+            '<b>• За месяц:</b> {{ sua_income_month|money }} ({{ oc_income_month|plural(["операция", "операции", "операций"]) }})\n'
             '\n'
             '<b>↙️ Расходы:</b>\n' 
-            '<b>• За сегодня:</b> {{ sua_spendings_today|money }} ({{ oc_spendings_today }} операций)\n'
-            '<b>• За неделю:</b> {{ sua_spendings_week|money }} ({{ oc_spendings_week }} операций)\n'
-            '<b>• За месяц:</b> {{ sua_spendings_month|money }} ({{ oc_spendings_month }} операции)\n'
+            '<b>• За сегодня:</b> {{ sua_spendings_today|money }} ({{ oc_spendings_today|plural(["операция", "операции", "операций"]) }})\n'
+            '<b>• За неделю:</b> {{ sua_spendings_week|money }} ({{ oc_spendings_week|plural(["операция", "операции", "операций"]) }})\n'
+            '<b>• За месяц:</b> {{ sua_spendings_month|money }} ({{ oc_spendings_month|plural(["операция", "операции", "операций"]) }})\n'
             '\n'
             '📈 <b>Твои активы:</b>\n'
             '{% for name, details in assets.items() %}'
