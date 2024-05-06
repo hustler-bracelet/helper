@@ -23,8 +23,13 @@ settings_main_menu_dialog = Dialog(
         ),
         Start(
             Const('🗑 Стереть все данные обо мне'),
-            id='erase_all_data_about_user',
+            id='erase_all_data_about_user_menu',
             state=states.EraseAllDataAboutUser.MAIN
+        ),
+        Start(
+            Const('🛠 Изменить баланс'),
+            id='fix_balance_menu',
+            state=states.FixBalance.MAIN
         ),
         Cancel(Const('❌ Отмена')),
         state=states.SettingsMainMenu.MAIN

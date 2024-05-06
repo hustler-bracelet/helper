@@ -33,6 +33,7 @@ from hustler_bracelet.bot.dialogs.planning.complete_some_tasks import complete_s
 from hustler_bracelet.bot.dialogs.settings import settings_main_menu_dialog
 from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
 from hustler_bracelet.bot.dialogs.settings.erase_all_data_about_me import erase_all_data_about_me_dialog
+from hustler_bracelet.bot.dialogs.settings.fix_balance import fix_balance_menu_dialog
 from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
 from hustler_bracelet.bot.filters import SubChecker
 from hustler_bracelet.bot.middlewares import database_middleware
@@ -81,6 +82,7 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
 dialog_router = Router()
 
 dialog_router.include_routers(
+    fix_balance_menu_dialog,
     list_finance_events_menu_dialog,
     investments_main_menu_dialog,
     onboarding_dialog,
