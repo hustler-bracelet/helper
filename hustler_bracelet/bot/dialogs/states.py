@@ -125,6 +125,11 @@ class EraseAllDataAboutUser(StatesGroup):
     FINAL = State()
 
 
+class FixBalance(StatesGroup):
+    MAIN = State()
+    FINAL = State()
+
+
 class OnBoarding(StatesGroup):
     MAIN = State()
     FINANCE = State()
