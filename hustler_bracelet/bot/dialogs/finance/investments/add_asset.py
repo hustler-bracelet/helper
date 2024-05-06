@@ -41,7 +41,7 @@ async def get_base_amount_for_new_asset(
         message: types.Message,
         widget: ManagedTextInput,
         dialog_manager: DialogManager,
-        data: str
+        data: float
 ):
     dialog_manager.dialog_data['base_amount'] = data
     await dialog_manager.next()
