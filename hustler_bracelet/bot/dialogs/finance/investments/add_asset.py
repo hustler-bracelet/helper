@@ -1,14 +1,11 @@
-import operator
-
 from aiogram import types
 from aiogram_dialog import Window, Dialog, DialogManager
-from aiogram_dialog.widgets.common.items import ItemsGetterVariant
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-from aiogram_dialog.widgets.kbd import Cancel, ScrollingGroup, Back
-from aiogram_dialog.widgets.kbd.select import OnItemClick, Select
+from aiogram_dialog.widgets.kbd import Cancel
 from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.bot.dialogs.widgets import NumberInput
 from hustler_bracelet.managers import FinanceManager
 
 
@@ -70,25 +67,16 @@ add_asset_dialog = Dialog(
             '\n'
             'Введите сумму депозита:'
         ),
-        TextInput(
-            id='get_base_amount_for_new_asset',
-            on_success=get_base_amount_for_new_asset
-        ),
+        NumberInput(on_success=get_base_amount_for_new_asset),
         state=states.AddFinanceAsset.BASE_AMOUNT
     ),
     Window(
         Const(
             '➕ <b>Добавление актива</b>\n'
             '\n'
-            'Какой годовой процент? Если вы хотите добавлять прибыль вручную, напишите 0'
+            'Какой годовой процент? Если ты хочешь добавлять прибыль вручную, напишите 0'
         ),
-        TextInput(
-            id='get_percent_of_new_asset',
-            on_success=get_interest_rate_for_new_asset
-            # filter=...  # Фильтр имеет возможность обрабатывать данные. Выхлоп фильтра будет в data функции on_success.
-            # Если фильтр выбросит ValueError - вызовется on_error.
-            # Пример фильтра найди где-то в коде по ключевому слову "filter="
-        ),
+        NumberInput(on_success=get_interest_rate_for_new_asset),
         state=states.AddFinanceAsset.INTEREST_RATE
     ),
     Window(

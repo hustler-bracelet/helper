@@ -1,19 +1,17 @@
-import datetime
 import operator
-from datetime import date
 from typing import Any
 
 from aiogram import types
 from aiogram.types import CallbackQuery
-from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
+from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.common.items import ItemsGetterVariant
-from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-from aiogram_dialog.widgets.kbd import Cancel, Calendar, ManagedCalendar, CalendarConfig, Back, ScrollingGroup
+from aiogram_dialog.widgets.input import ManagedTextInput
+from aiogram_dialog.widgets.kbd import Cancel, Back, ScrollingGroup
 from aiogram_dialog.widgets.kbd.select import OnItemClick, Select
-from aiogram_dialog.widgets.text import Const, Format, Jinja
+from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
-from hustler_bracelet.bot.dialogs.widgets import Today
+from hustler_bracelet.bot.dialogs.widgets import NumberInput
 from hustler_bracelet.managers import FinanceManager
 
 
@@ -107,10 +105,7 @@ add_profit_dialog = Dialog(
             '\n'
             'Сколько ты заработал?'
         ),
-        TextInput(
-            id='asset_profit_amount',
-            on_success=on_profit_entered
-        ),
+        NumberInput(on_success=on_profit_entered),
         Back(Const('⬅️ Назад')),
         state=states.AddInvestmentProfit.PROFIT
     ),

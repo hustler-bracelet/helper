@@ -9,7 +9,7 @@ from simpleeval import SimpleEval
 from hustler_bracelet.bot.utils import get_event_type
 from hustler_bracelet.enums import FinanceTransactionType
 
-_evaluator = SimpleEval()
+
 
 
 def get_finance_event_type_name(finance_event_type: FinanceTransactionType):
@@ -106,35 +106,6 @@ def represent_date(date: datetime.date) -> str:
         date_representation += f' {date.year}'
 
     return date_representation
-
-
-def validate_number_with_math(text: str):
-    amount = text.lower()
-
-    replace_mapping = {
-        ' ': '',
-        ',': '.',
-        '^': '**',
-        ':': '/'
-    }
-    for old, new in replace_mapping.items():
-        amount = amount.replace(old, new)
-
-    try:
-        amount = _evaluator.eval(amount)
-    except BaseException:
-        raise ValueError('Кажется, ты ввёл неправильную формулу')
-
-    return amount
-
-
-async def process_incorrect_input(
-        message: types.Message,
-        widget: ManagedTextInput,
-        dialog_manager: DialogManager,
-        error: ValueError,
-):
-    await message.answer('\n'.join([*map(html.quote, error.args), 'Попробуй ещё раз']))
 
 
 def get_jinja_filters() -> dict[str, Callable[..., str]]:

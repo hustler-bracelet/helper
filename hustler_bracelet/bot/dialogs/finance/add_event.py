@@ -1,11 +1,10 @@
 from datetime import date
-from datetime import date
 from typing import Any
 
-from aiogram import types, html
+from aiogram import types
 from aiogram.types import CallbackQuery
 from aiogram_dialog import ChatEvent, Dialog, DialogManager, Window
-from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
+from aiogram_dialog.widgets.input import ManagedTextInput
 from aiogram_dialog.widgets.kbd import (
     Calendar, ManagedCalendar, Button, Back, Cancel
 )
@@ -13,8 +12,8 @@ from aiogram_dialog.widgets.text import Const, Format, Jinja
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
-from hustler_bracelet.bot.dialogs.widgets import Today
-from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter, validate_number_with_math, process_incorrect_input
+from hustler_bracelet.bot.dialogs.widgets import Today, NumberInput
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter
 from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
@@ -133,12 +132,7 @@ add_finance_event_dialog = Dialog(
             '\n'
             'Введи сумму, которую ты {finance_event_verb} (в рублях):'
         ),
-        TextInput(
-            id='amount_of_new_event',
-            on_success=on_amount_for_new_event_entered,
-            on_error=process_incorrect_input,
-            type_factory=validate_number_with_math
-        ),
+        NumberInput(on_success=on_amount_for_new_event_entered),
         Back(Const('⬅️ Назад')),
         state=states.AddFinanceEvent.ENTER_VALUE
     ),
