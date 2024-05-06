@@ -34,6 +34,11 @@ class FinanceCategoriesManagementMenu(StatesGroup):
     MAIN = State()
 
 
+class FinanceEventsListMenu(StatesGroup):
+    MAIN = State()
+    LIST = State()
+
+
 class FinanceInvestmentsMenu(StatesGroup):
     MAIN = State()
 
