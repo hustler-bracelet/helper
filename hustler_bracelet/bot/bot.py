@@ -24,6 +24,7 @@ from hustler_bracelet.bot.dialogs.finance.investments.add_profit import add_prof
 from hustler_bracelet.bot.dialogs.finance.investments.change_interest_rate import change_interest_rate_dialog
 from hustler_bracelet.bot.dialogs.finance.investments.delete_asset import delete_assets_dialog
 from hustler_bracelet.bot.dialogs.finance.investments.rename_asset import rename_asset_dialog
+from hustler_bracelet.bot.dialogs.finance.list_events import list_finance_events_menu_dialog
 from hustler_bracelet.bot.dialogs.main import main_dialog
 from hustler_bracelet.bot.dialogs.onboarding import onboarding_dialog
 from hustler_bracelet.bot.dialogs.planning import planning_main_menu_dialog
@@ -74,9 +75,13 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
     )
 
 
+# TODO: Сделать хендлинг необработанных ошибок
+
+
 dialog_router = Router()
 
 dialog_router.include_routers(
+    list_finance_events_menu_dialog,
     investments_main_menu_dialog,
     onboarding_dialog,
     erase_all_data_about_me_dialog,

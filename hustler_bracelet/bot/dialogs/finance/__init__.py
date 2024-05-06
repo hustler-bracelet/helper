@@ -128,6 +128,11 @@ finance_menu_dialog = Dialog(
             state=states.FinanceCategoriesManagementMenu.MAIN
         ),
         Start(
+            text=Const('🕔 История транзакций'),
+            id='list_finance_events_menu',
+            state=states.FinanceEventsListMenu.MAIN
+        ),
+        Start(
             text=Const('📈 Инвестиции β'),
             id='investments_management_menu',
             state=states.FinanceInvestmentsMenu.MAIN
