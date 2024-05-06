@@ -198,9 +198,9 @@ class FinanceManager:
 
     async def get_active_tasks(self) -> Sequence[Task]:
         query = select(Task).where(
-            Task.telegram_id == self._user_manager.telegram_id
+            Task.telegram_id == self._user_manager.telegram_id,
+            Task.is_completed == False
         )
-        query = query.where(Task.is_completed == 0)  # FIXME HACK TODO XXX: this shit aint working if using not stmt
         return (await self._session.exec(query)).all()
 
     async def get_amount_of_tasks_filtered_by_planned_complete_date(self, planned_complete_date: date, *, completed: bool | None) -> Sequence[Task]:
