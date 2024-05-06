@@ -50,10 +50,7 @@ async def on_date_clicked(
 
     manager.dialog_data['event_date'] = selected_date  # Пригодится при форматировании финального сообщения
 
-    try:
-        category = await finance_manager.get_category_by_id(manager.dialog_data['category_id'])
-    except CategoryNotFoundError:
-        return  # TODO: Добавить реакцию на CategoryNotFoundError
+    category = await finance_manager.get_category_by_id(manager.dialog_data['category_id'])
 
     await finance_manager.add_finance_transaction(
         category,
