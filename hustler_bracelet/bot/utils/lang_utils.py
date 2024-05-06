@@ -108,5 +108,6 @@ def get_jinja_filters() -> dict[str, Callable[..., str]]:
         'plural': plural_form,
         'date': represent_date,
         'money': format_money_amount,
-        'number': format_number
+        'number': format_number,
+        'debug': print,
     }
