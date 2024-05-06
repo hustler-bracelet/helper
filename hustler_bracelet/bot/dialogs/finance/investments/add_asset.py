@@ -74,7 +74,7 @@ add_asset_dialog = Dialog(
         Const(
             '➕ <b>Добавление актива</b>\n'
             '\n'
-            'Какой годовой процент? Если ты хочешь добавлять прибыль вручную, напишите 0'
+            'Какой годовой процент? Если хочешь добавлять прибыль вручную - ответь 0'
         ),
         NumberInput(on_success=get_interest_rate_for_new_asset),
         state=states.AddFinanceAsset.INTEREST_RATE
