@@ -50,9 +50,9 @@ class NumberInput(TextInput):
     def __init__(
             self,
             id: str = '__number_input__',
-            type_factory: TypeFactory = str,
+            type_factory: TypeFactory | None = None,
             on_success: OnSuccess | WidgetEventProcessor | None = None,
-            filter: Callable[[float], Any] | None = None,
+            filter: Callable[..., Any] | None = None,
             on_error: OnError | WidgetEventProcessor | None = None,
     ):
         super().__init__(
@@ -85,7 +85,7 @@ class NumberInput(TextInput):
             raise ValueError('Кажется, ты ввёл неправильную формулу')
 
         if self.user_type_factory:
-            amount = self.user_type_factory(amount)
+            amount = self.user_type_factory(str(amount))
 
         return amount
 
