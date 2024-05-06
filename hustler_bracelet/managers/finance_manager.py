@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import random
-
 from datetime import date, datetime, timedelta
 from typing import Sequence, NoReturn
 
 from sqlalchemy.sql.functions import func
 from sqlmodel import select, delete
 
-from hustler_bracelet.bot.utils.lang_utils import format_money_amount
 from hustler_bracelet.database.asset import Asset
 from hustler_bracelet.database.category import Category
-from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError
+from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError, UserNotFoundError
 from hustler_bracelet.database.finance_transaction import FinanceTransaction
 from hustler_bracelet.database.investment_transaction import InvestmentTransaction
 from hustler_bracelet.database.task import Task
@@ -486,3 +484,19 @@ class FinanceManager:
             )
         ).one()
         return query_results or 0
+
+    async def set_balance(self, new_balance: float):
+        user = (
+            await self._session.exec(
+                select(User)
+                .where(
+                    User.telegram_id == self._user_manager.telegram_id
+                )
+            )
+        ).first()
+
+        if user is None:
+            raise UserNotFoundError()
+
+        user.current_balance = new_balance
+        await self._session.commit()
