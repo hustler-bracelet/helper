@@ -1,7 +1,9 @@
 import datetime
 from typing import Callable
 
+from aiogram import types, html
 from aiogram_dialog import DialogManager
+from aiogram_dialog.widgets.input import ManagedTextInput
 from simpleeval import SimpleEval
 
 from hustler_bracelet.bot.utils import get_event_type
@@ -124,6 +126,15 @@ def validate_number_with_math(text: str):
         raise ValueError('Кажется, ты ввёл неправильную формулу')
 
     return amount
+
+
+async def process_incorrect_input(
+        message: types.Message,
+        widget: ManagedTextInput,
+        dialog_manager: DialogManager,
+        error: ValueError,
+):
+    await message.answer('\n'.join([*map(html.quote, error.args), 'Попробуй ещё раз']))
 
 
 def get_jinja_filters() -> dict[str, Callable[..., str]]:

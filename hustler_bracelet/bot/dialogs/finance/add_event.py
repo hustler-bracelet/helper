@@ -14,7 +14,7 @@ from aiogram_dialog.widgets.text import Const, Format, Jinja
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.widgets import get_choose_category_kb
 from hustler_bracelet.bot.dialogs.widgets import Today
-from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter, validate_number_with_math
+from hustler_bracelet.bot.utils.lang_utils import finance_event_words_getter, event_value_getter, validate_number_with_math, process_incorrect_input
 from hustler_bracelet.managers.finance_manager import FinanceManager
 
 
@@ -101,15 +101,6 @@ async def on_amount_for_new_event_entered(
     await dialog_manager.next()
 
 
-async def process_incorrect_amount_for_new_event(
-        message: types.Message,
-        widget: ManagedTextInput,
-        dialog_manager: DialogManager,
-        error: ValueError,
-):
-    await message.answer('\n'.join([*map(html.quote, error.args), 'Попробуй ещё раз']))
-
-
 async def on_process_result(
         start_data: dict,
         result_data: dict,
@@ -145,7 +136,7 @@ add_finance_event_dialog = Dialog(
         TextInput(
             id='amount_of_new_event',
             on_success=on_amount_for_new_event_entered,
-            on_error=process_incorrect_amount_for_new_event,
+            on_error=process_incorrect_input,
             type_factory=validate_number_with_math
         ),
         Back(Const('⬅️ Назад')),
