@@ -136,3 +136,7 @@ class OnBoarding(StatesGroup):
     PLANNING = State()
     SPORT = State()
     FINAL = State()
+
+
+class Activities(StatesGroup):
+    MAIN = State()
