@@ -63,7 +63,17 @@ def format_number(number: float) -> str:
 
 
 def format_money_amount(money_amount: float) -> str:
-    return f'{format_number(money_amount)}₽'
+    base = f'{format_number(money_amount)}₽'
+    if money_amount == 52.0:
+        base += ' 🖐✌️'
+    elif money_amount == 228.0:
+        base += ' 💊'
+    elif money_amount == 1337.0 or money_amount == 420.0:
+        base += ' 😮‍💨'
+    elif money_amount == 100000.0:
+        base += ' 🥳'
+
+    return base
 
 
 async def event_value_getter(dialog_manager: DialogManager, **kwargs):
