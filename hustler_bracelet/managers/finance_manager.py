@@ -7,6 +7,7 @@ from typing import Sequence, NoReturn
 from sqlalchemy.sql.functions import func
 from sqlmodel import select, delete
 
+from hustler_bracelet.database.activity import Activity
 from hustler_bracelet.database.asset import Asset
 from hustler_bracelet.database.category import Category
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError, UserNotFoundError
@@ -83,6 +84,7 @@ class FinanceManager:
 
         # Create the category
         new_category = Category(
+            id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,
             name=name,
             type=category_type
@@ -110,8 +112,8 @@ class FinanceManager:
         finance_transaction = FinanceTransaction(
             id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,
-            type=category.type,
-            category=category.id,
+            type=await category.awaitable_attrs.type,
+            category=await category.awaitable_attrs.id,
             value=value,
             added_on=datetime.now(),
             transaction_date=transaction_date
@@ -123,7 +125,7 @@ class FinanceManager:
                 select(User).where(User.telegram_id == self._user_manager.telegram_id)
             )
         ).first()
-        if category.type is FinanceTransactionType.INCOME:
+        if category.type.upper() == FinanceTransactionType.INCOME.value:
             user.current_balance += value
         else:
             user.current_balance -= value
@@ -142,7 +144,25 @@ class FinanceManager:
         return finance_transactions_sum or 0.
 
     async def get_category_by_id(self, id_: int) -> Category | NoReturn:
-        category = (await self._session.exec(select(Category).where(Category.id == id_))).first()
+        category = (await self._session.exec(
+            select(Category).where(Category.id == int(id_))
+        )).first()
+
+        self._session.add(
+            Activity(
+                id=create_int_uid(),
+                name='abobus',
+                emoji='💰',
+                description='иди нахуй пон',
+                fund=20000,
+                total_places=20,
+                occupied_places=0,
+                started_on=datetime.now(),
+                deadline=datetime.now() + timedelta(days=14),
+                is_running=True
+            )
+        )
+        await self._session.commit()
 
         if category is None:
             raise CategoryNotFoundError()
@@ -362,6 +382,7 @@ class FinanceManager:
         investment_transaction = InvestmentTransaction(
             id=create_int_uid(),
             telegram_id=self._user_manager.telegram_id,
+            type=FinanceTransactionType.INCOME,
             added_on=datetime.now(),
             asset_id=asset.id,
             value=profit

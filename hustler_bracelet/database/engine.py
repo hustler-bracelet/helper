@@ -1,8 +1,24 @@
 # -*- coding: utf-8 -*-
+
+import config
 from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy import URL
 from sqlmodel import create_engine, SQLModel
 
-DATABASE_ENGINE = AsyncEngine(create_engine('sqlite+aiosqlite:///hustler_bracelet.sqlite', future=True))
+DATABASE_ENGINE = AsyncEngine(
+    create_engine(
+        url=URL(
+            drivername='postgresql+asyncpg',
+            username=config.DB_USER,
+            password=config.DB_PASS,
+            host=config.DB_HOST,
+            port=5432,
+            database=config.DB_NAME,
+            query={}
+        )
+    )
+)
+# DATABASE_ENGINE = AsyncEngine(create_engine('sqlite+aiosqlite:///hustler_bracelet.sqlite'))
 
 
 async def create_all_tables() -> None:

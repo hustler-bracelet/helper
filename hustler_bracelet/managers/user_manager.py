@@ -29,13 +29,16 @@ class UserManager:
         ).all()
         return bool(query_result)
 
-    async def create_new_user(self, telegram_name: str):
+    async def create_new_user(self, telegram_name: str, referral_id: int | None = None):
         assert not await self._is_user_exists()
 
         new_user = User(
             telegram_id=self._telegram_id,
             telegram_name=telegram_name,
-            current_balance=0.0
+            current_balance=0.0,
+            referred_by=referral_id,
+            is_participating_in_activity=False,
+            selected_niche_id=None
         )
         self._session.add(new_user)
         await self._session.commit()

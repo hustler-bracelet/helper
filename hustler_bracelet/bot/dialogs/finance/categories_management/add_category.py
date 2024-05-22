@@ -21,7 +21,7 @@ async def on_category_type_selected(
         manager: DialogManager,
         item_id: str
 ):
-    manager.dialog_data['event_type'] = FinanceTransactionType(item_id)
+    manager.dialog_data['event_type'] = FinanceTransactionType(item_id.upper())
 
     await manager.next()
 
