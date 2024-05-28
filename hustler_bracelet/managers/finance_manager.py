@@ -56,7 +56,7 @@ class FinanceManager:
         query_results = (await self._session.exec(
             select(func.count(FinanceTransaction.id)).where(
                 FinanceTransaction.telegram_id == self._user_manager.telegram_id,
-                FinanceTransaction.type == category_type
+                FinanceTransaction.type == category_type.value
             )
         )).one()
         return query_results or 0
