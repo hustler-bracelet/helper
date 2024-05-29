@@ -481,12 +481,6 @@ class FinanceManager:
             )
         )
         await self._session.exec(
-            delete(User)
-            .where(
-                User.telegram_id == user_id
-            )
-        )
-        await self._session.exec(
             delete(Asset)
             .where(
                 Asset.telegram_id == user_id
@@ -496,6 +490,12 @@ class FinanceManager:
             delete(InvestmentTransaction)
             .where(
                 InvestmentTransaction.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(User)
+            .where(
+                User.telegram_id == user_id
             )
         )
         await self._session.commit()
