@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.text import Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.finance.add_event import on_start_add_event_dialog_click
-from hustler_bracelet.database.asset import Asset
+from hustler_bracelet.database import Asset
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.finance_manager import FinanceManager
 

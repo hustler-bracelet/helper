@@ -3,7 +3,7 @@
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from hustler_bracelet.database.user import User
+from hustler_bracelet.database import User
 
 
 class UserManager:
