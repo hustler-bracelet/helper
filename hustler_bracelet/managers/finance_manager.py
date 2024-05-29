@@ -55,10 +55,13 @@ class FinanceManager:
         return query_results
 
     async def get_events_amount(self, category_type: FinanceTransactionType) -> int:
+        # TODO: add parameter to separate all and today events
+
         query_results = (await self._session.exec(
             select(func.count(FinanceTransaction.id)).where(
                 FinanceTransaction.telegram_id == self._user_manager.telegram_id,
-                FinanceTransaction.type == category_type.value
+                FinanceTransaction.type == category_type,
+                FinanceTransaction.transaction_date == date.today()
             )
         )).one()
         return query_results or 0

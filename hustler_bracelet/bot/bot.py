@@ -35,6 +35,7 @@ from hustler_bracelet.bot.dialogs.settings.about_bot import about_bot_dialog
 from hustler_bracelet.bot.dialogs.settings.erase_all_data_about_me import erase_all_data_about_me_dialog
 from hustler_bracelet.bot.dialogs.settings.fix_balance import fix_balance_menu_dialog
 from hustler_bracelet.bot.dialogs.sport import sport_main_menu_dialog
+from hustler_bracelet.bot.dialogs.activity import activity_dialog
 from hustler_bracelet.bot.filters import SubChecker
 from hustler_bracelet.bot.middlewares import database_middleware
 from hustler_bracelet.bot.utils.lang_utils import get_jinja_filters
@@ -53,6 +54,7 @@ async def start(message: Message, dialog_manager: DialogManager):
 async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
     # Example of handling UnknownIntent Error and starting new dialog.
     logging.error("Restarting dialog: %s", event.exception)
+
     if event.update.callback_query:
         await event.update.callback_query.answer(
             "Бот был перезапущен из-за технических работ.\n"
@@ -63,12 +65,14 @@ async def on_unknown_intent(event: ErrorEvent, dialog_manager: DialogManager):
                 await event.update.callback_query.message.delete()
             except TelegramBadRequest:
                 pass  # whatever
+
     elif event.update.message:
         await event.update.message.answer(
             "Бот был перезапущен из-за технических работ.\n"
             "Переходим в главное меню.",
             reply_markup=ReplyKeyboardRemove(),
         )
+
     await dialog_manager.start(
         states.Main.MAIN,
         mode=StartMode.RESET_STACK,
@@ -103,7 +107,8 @@ dialog_router.include_routers(
     delete_assets_dialog,
     add_profit_dialog,
     rename_asset_dialog,
-    change_interest_rate_dialog
+    change_interest_rate_dialog,
+    activity_dialog
 )
 
 
