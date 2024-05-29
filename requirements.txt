@@ -4,3 +4,5 @@ aiogram-dialog
 SQLAlchemy~=2.0.29
 simpleeval~=0.9.13
 asyncpg
+psycopg2
+alembic

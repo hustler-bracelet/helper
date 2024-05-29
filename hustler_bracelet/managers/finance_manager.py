@@ -7,14 +7,16 @@ from typing import Sequence, NoReturn
 from sqlalchemy.sql.functions import func
 from sqlmodel import select, delete
 
-from hustler_bracelet.database.activity import Activity
-from hustler_bracelet.database.asset import Asset
-from hustler_bracelet.database.category import Category
+from hustler_bracelet.database import (
+    Activity,
+    Asset,
+    Category,
+    FinanceTransaction,
+    InvestmentTransaction,
+    Task,
+    User
+)
 from hustler_bracelet.database.exceptions import CategoryAlreadyExistsError, CategoryNotFoundError, TaskNotFoundError, UserNotFoundError
-from hustler_bracelet.database.finance_transaction import FinanceTransaction
-from hustler_bracelet.database.investment_transaction import InvestmentTransaction
-from hustler_bracelet.database.task import Task
-from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.user_manager import UserManager
 
@@ -482,12 +484,6 @@ class FinanceManager:
             )
         )
         await self._session.exec(
-            delete(User)
-            .where(
-                User.telegram_id == user_id
-            )
-        )
-        await self._session.exec(
             delete(Asset)
             .where(
                 Asset.telegram_id == user_id
@@ -497,6 +493,12 @@ class FinanceManager:
             delete(InvestmentTransaction)
             .where(
                 InvestmentTransaction.telegram_id == user_id
+            )
+        )
+        await self._session.exec(
+            delete(User)
+            .where(
+                User.telegram_id == user_id
             )
         )
         await self._session.commit()

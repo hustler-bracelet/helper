@@ -7,8 +7,8 @@ from aiogram_dialog.widgets.text import Format, Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.utils.lang_utils import plural_form, represent_date
-from hustler_bracelet.database.asset import Asset
-from hustler_bracelet.database.investment_transaction import InvestmentTransaction
+from hustler_bracelet.database import Asset
+from hustler_bracelet.database import InvestmentTransaction
 from hustler_bracelet.managers import FinanceManager
 
 
