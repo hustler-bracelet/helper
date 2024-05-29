@@ -33,6 +33,7 @@ async def on_complete_selected_tasks_click(
     if not completed_tasks_ids:
         await callback.answer('Выберите хотя-бы одну задачу')
         return
+
     await finance_manager.mark_tasks_as_completed(completed_tasks_ids)
 
     await manager.done()
