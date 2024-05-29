@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from hustler_bracelet.database import BaseModel
-from config import DB_HOST, DB_NAME, DB_PASS, DB_USER
+from config import DB_HOST, DB_NAME, DB_PASS, DB_USER, DB_PORT
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +23,7 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 target_metadata = BaseModel.metadata
 
-config.set_main_option("sqlalchemy.url", f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5433/{DB_NAME}")
+config.set_main_option("sqlalchemy.url", f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
