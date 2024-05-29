@@ -24,4 +24,5 @@ DATABASE_ENGINE = AsyncEngine(
 async def create_all_tables() -> None:
     async with DATABASE_ENGINE.begin() as conn:
         # await conn.run_sync(SQLModel.metadata.drop_all)
-        return await conn.run_sync(SQLModel.metadata.create_all)
+        # return await conn.run_sync(SQLModel.metadata.create_all)
+        pass
