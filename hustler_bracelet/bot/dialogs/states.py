@@ -138,5 +138,40 @@ class OnBoarding(StatesGroup):
     FINAL = State()
 
 
-class Activities(StatesGroup):
+class Activity(StatesGroup):
     MAIN = State()
+    TOP = State()
+
+
+class ActivityQuit(StatesGroup):
+    MAIN = State()
+    FINAL = State()
+
+
+class ActivityTask(StatesGroup):
+    MAIN = State()
+
+
+class ActivityTaskCompletion(StatesGroup):
+    MAIN = State()
+    FINAL = State()
+
+
+class ActivityTaskSkip(StatesGroup):
+    MAIN = State()
+    FINAL = State()
+
+
+class ActivityOnboarding(StatesGroup):
+    MAIN = State()
+    FINAL = State()
+
+
+class ActivityAdmin(StatesGroup):
+    MAIN = State()
+
+
+class LaunchActivity(StatesGroup):
+    MAIN = State()
+    CONFIRM_LAUNCH = State()
+    FINAL = State()

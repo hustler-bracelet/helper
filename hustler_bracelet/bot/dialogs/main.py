@@ -65,6 +65,11 @@ main_dialog = Dialog(
             )
         ),
         Start(
+            text=Const('💰 Сезон крипты'),  # TODO: get from activity name
+            id='activity_menu',
+            state=states.Activity.MAIN
+        ),
+        Start(
             text=Const('⚙️ Настройки'),
             id='setting_menu',
             state=states.SettingsMainMenu.MAIN
