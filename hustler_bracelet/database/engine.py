@@ -12,7 +12,7 @@ DATABASE_ENGINE = AsyncEngine(
             username=config.DB_USER,
             password=config.DB_PASS,
             host=config.DB_HOST,
-            port=5432,
+            port=config.DB_PORT,
             database=config.DB_NAME,
             query={}
         )
