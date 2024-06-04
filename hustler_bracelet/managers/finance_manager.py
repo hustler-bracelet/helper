@@ -17,10 +17,7 @@ from hustler_bracelet.database.task import Task
 from hustler_bracelet.database.user import User
 from hustler_bracelet.enums import FinanceTransactionType
 from hustler_bracelet.managers.user_manager import UserManager
-
-
-def create_int_uid() -> int:
-    return int(''.join([str(random.randint(0, 9)) for _ in range(9)]))
+from hustler_bracelet.utils import create_int_uid
 
 
 class FinanceManager:
@@ -53,10 +50,13 @@ class FinanceManager:
         return query_results
 
     async def get_events_amount(self, category_type: FinanceTransactionType) -> int:
+        # TODO: add parameter to separate all and today events
+
         query_results = (await self._session.exec(
             select(func.count(FinanceTransaction.id)).where(
                 FinanceTransaction.telegram_id == self._user_manager.telegram_id,
-                FinanceTransaction.type == category_type
+                FinanceTransaction.type == category_type,
+                FinanceTransaction.transaction_date == date.today()
             )
         )).one()
         return query_results or 0
@@ -147,22 +147,6 @@ class FinanceManager:
         category = (await self._session.exec(
             select(Category).where(Category.id == int(id_))
         )).first()
-
-        self._session.add(
-            Activity(
-                id=create_int_uid(),
-                name='abobus',
-                emoji='💰',
-                description='иди нахуй пон',
-                fund=20000,
-                total_places=20,
-                occupied_places=0,
-                started_on=datetime.now(),
-                deadline=datetime.now() + timedelta(days=14),
-                is_running=True
-            )
-        )
-        await self._session.commit()
 
         if category is None:
             raise CategoryNotFoundError()
