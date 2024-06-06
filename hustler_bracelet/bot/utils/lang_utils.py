@@ -64,14 +64,18 @@ def format_number(number: float) -> str:
 
 def format_money_amount(money_amount: float) -> str:
     base = f'{format_number(money_amount)}₽'
-    if money_amount == 52.0:
+
+    rounded_money_amount = round(money_amount)
+    if rounded_money_amount == 52:
         base += ' 🖐✌️'
-    elif money_amount == 228.0:
+    elif rounded_money_amount == 228:
         base += ' 💊'
-    elif money_amount == 1337.0 or money_amount == 420.0:
+    elif rounded_money_amount in (1337, 420):
         base += ' 😮‍💨'
-    elif money_amount == 100000.0:
+    elif rounded_money_amount == 100_000:
         base += ' 🥳'
+    elif rounded_money_amount == 1488:
+        base += ' 📀'
 
     return base
 
@@ -118,10 +122,15 @@ def represent_date(date: datetime.date) -> str:
     return date_representation
 
 
+def represent_datetime(datetime: datetime.datetime) -> str:
+    return f'{represent_date(datetime.date())} ({datetime.time().strftime("%H:%M")} МСК)'
+
+
 def get_jinja_filters() -> dict[str, Callable[..., str]]:
     return {
         'plural': plural_form,
         'date': represent_date,
+        'datetime': represent_datetime,
         'money': format_money_amount,
         'number': format_number,
         'debug': print,

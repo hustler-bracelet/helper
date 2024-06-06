@@ -150,6 +150,8 @@ class ActivityQuit(StatesGroup):
 
 class ActivityTask(StatesGroup):
     MAIN = State()
+    DECLINE = State()
+    SURE_DECLINE = State()
 
 
 class ActivityTaskCompletion(StatesGroup):
@@ -157,14 +159,18 @@ class ActivityTaskCompletion(StatesGroup):
     FINAL = State()
 
 
-class ActivityTaskSkip(StatesGroup):
-    MAIN = State()
-    FINAL = State()
+# class ActivityTaskSkip(StatesGroup):
+#     MAIN = State()
+#     FINAL = State()
 
 
 class ActivityOnboarding(StatesGroup):
     MAIN = State()
     FINAL = State()
+
+
+class ActivityTop(StatesGroup):
+    MAIN = State()
 
 
 class ActivityAdmin(StatesGroup):
@@ -174,4 +180,9 @@ class ActivityAdmin(StatesGroup):
 class LaunchActivity(StatesGroup):
     MAIN = State()
     CONFIRM_LAUNCH = State()
+    FINAL = State()
+
+
+class Activities(StatesGroup):
+    MAIN = State()
     FINAL = State()

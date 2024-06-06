@@ -1,6 +1,5 @@
 from aiogram_dialog import Dialog, LaunchMode, Window, DialogManager
 from aiogram_dialog.widgets.kbd import Start, Row
-from aiogram_dialog.widgets.media import StaticMedia
 from aiogram_dialog.widgets.text import Const, Jinja
 
 from . import states
@@ -73,6 +72,11 @@ main_dialog = Dialog(
             text=Const('⚙️ Настройки'),
             id='setting_menu',
             state=states.SettingsMainMenu.MAIN
+        ),
+        Start(
+            text=Const('Активности'),
+            id='activities_menu',
+            state=states.Activities.MAIN,
         ),
         state=states.Main.MAIN,
         getter=(main_dialog_getter, get_planning_data_getter(include_other_days=False)),
