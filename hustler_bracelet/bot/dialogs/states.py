@@ -181,8 +181,3 @@ class LaunchActivity(StatesGroup):
     MAIN = State()
     CONFIRM_LAUNCH = State()
     FINAL = State()
-
-
-class Activities(StatesGroup):
-    MAIN = State()
-    FINAL = State()

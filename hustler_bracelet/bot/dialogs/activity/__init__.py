@@ -7,9 +7,23 @@ from aiogram_dialog.widgets.kbd import Start, Back, Cancel, Next
 from aiogram_dialog.widgets.text import Format, Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.managers import FinanceManager
 
-ACTIVITY_DESCRIPTION = """Ну что, хаслеры, время пампить, дампить, хуямпить, МММ’ить, и регулировать стаканы!
-Выбирай свою нишу и вперёд жарить стейкинги!"""
+
+async def on_start_activity_dialog(start_data: dict, manager: DialogManager):
+    if True:  # random.randint(0, 1):  # Если ниша не выбрана
+        await manager.start(states.ActivityOnboarding.MAIN)
+        return
+
+
+async def on_process_result(
+        start_data: dict,
+        result_data: dict,
+        dialog_manager: DialogManager
+):
+    if result_data and result_data.get('show_task', True):
+        await dialog_manager.start(states.ActivityTask.MAIN)
+        return
 
 
 async def top_getter(dialog_manager: DialogManager, **kwargs):
@@ -34,7 +48,8 @@ async def activity_task_getter(dialog_manager: DialogManager, **kwargs):
 async def activity_getter(dialog_manager: DialogManager, **kwargs):
     return {
         "activity_name": "💰 Сезон крипты",
-        "activity_description": ACTIVITY_DESCRIPTION,
+        "activity_description": "Ну что, хаслеры, время пампить, дампить, хуямпить, МММ’ить, и регулировать стаканы!\n"
+                                "Выбирай свою нишу и вперёд жарить стейкинги!",
         "activity_launched_at": datetime.datetime.now(),
         "activity_deadline": datetime.datetime.now() + datetime.timedelta(days=10),
         "activity_fund": 100_000,
@@ -126,6 +141,8 @@ activity_dialog = Dialog(
         ),
         Back(Const('⬅️ Назад')),
         state=states.Activity.TOP,
-        getter=activity_top_getter
-    )
+        getter=activity_top_getter,
+    ),
+    on_start=on_start_activity_dialog,
+    on_process_result=on_process_result
 )

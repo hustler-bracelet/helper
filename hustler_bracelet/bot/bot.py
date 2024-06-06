@@ -14,7 +14,7 @@ from aiogram_dialog.api.exceptions import UnknownIntent
 from aiogram_dialog.widgets.text import setup_jinja
 
 import config
-from hustler_bracelet.bot.dialogs.activities import activities_menu_dialog
+from hustler_bracelet.bot.dialogs.activity.choose_hiche import choose_niche_dialog
 from hustler_bracelet.bot.dialogs.activity.complete_task import complete_task_dialog
 from hustler_bracelet.bot.dialogs.activity.quit import activity_quit_dialog
 from hustler_bracelet.bot.dialogs.activity.task import activity_task_dialog
@@ -95,7 +95,6 @@ dialog_router.include_routers(
     list_finance_events_menu_dialog,
     investments_main_menu_dialog,
     onboarding_dialog,
-    activities_menu_dialog,
     erase_all_data_about_me_dialog,
     main_dialog,
     sport_main_menu_dialog,
@@ -117,7 +116,8 @@ dialog_router.include_routers(
     activity_dialog,
     activity_quit_dialog,
     activity_task_dialog,
-    complete_task_dialog
+    complete_task_dialog,
+    choose_niche_dialog
 )
 
 
