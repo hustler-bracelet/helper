@@ -6,3 +6,5 @@ simpleeval~=0.9.13
 asyncpg
 psycopg2
 alembic
+aiogram_album
+cachetools
