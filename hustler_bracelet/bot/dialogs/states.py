@@ -138,6 +138,10 @@ class OnBoarding(StatesGroup):
     FINAL = State()
 
 
+class ActivitiesList(StatesGroup):
+    MAIN = State()
+
+
 class Activity(StatesGroup):
     MAIN = State()
     TOP = State()

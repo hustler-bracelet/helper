@@ -16,6 +16,7 @@ from aiogram_dialog.widgets.text import setup_jinja
 import config
 from hustler_bracelet.bot.dialogs.activity.choose_hiche import choose_niche_dialog
 from hustler_bracelet.bot.dialogs.activity.complete_task import complete_task_dialog
+from hustler_bracelet.bot.dialogs.activity.list import activities_list_dialog
 from hustler_bracelet.bot.dialogs.activity.quit import activity_quit_dialog
 from hustler_bracelet.bot.dialogs.activity.task import activity_task_dialog
 from hustler_bracelet.bot.dialogs.finance import finance_menu_dialog
@@ -117,7 +118,8 @@ dialog_router.include_routers(
     activity_quit_dialog,
     activity_task_dialog,
     complete_task_dialog,
-    choose_niche_dialog
+    choose_niche_dialog,
+    activities_list_dialog
 )
 
 

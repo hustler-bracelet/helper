@@ -64,19 +64,14 @@ main_dialog = Dialog(
             )
         ),
         Start(
-            text=Const('💰 Сезон крипты'),  # TODO: get from activity name
+            text=Const('Надо быть активным'),
             id='activity_menu',
-            state=states.Activity.MAIN
+            state=states.ActivitiesList.MAIN
         ),
         Start(
             text=Const('⚙️ Настройки'),
             id='setting_menu',
             state=states.SettingsMainMenu.MAIN
-        ),
-        Start(
-            text=Const('Активности'),
-            id='activities_menu',
-            state=states.Activity.MAIN
         ),
         state=states.Main.MAIN,
         getter=(main_dialog_getter, get_planning_data_getter(include_other_days=False)),
