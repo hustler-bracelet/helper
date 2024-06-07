@@ -6,7 +6,7 @@ from sqlalchemy import Column, BigInteger
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import SQLModel, Field
 
-from hustler_bracelet.enums import CompletionStatus
+from hustler_bracelet.enums import TaskCompletionStatus
 
 
 class ActivityTaskCompletion(SQLModel, AsyncAttrs, table=True):
@@ -14,7 +14,7 @@ class ActivityTaskCompletion(SQLModel, AsyncAttrs, table=True):
     telegram_id: int = Field(sa_column=Column(BigInteger()))
     activity_task_id: int = Field(foreign_key='activitytask.id')
     proof_id: int = Field(foreign_key='taskcompletionproof.id')
-    status: CompletionStatus
+    status: TaskCompletionStatus
     sent_on: datetime
     checked_on: datetime
     points: int

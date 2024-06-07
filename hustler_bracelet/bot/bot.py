@@ -8,11 +8,16 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import ErrorEvent, Message, ReplyKeyboardRemove
+from aiogram_album.count_check_middleware import CountCheckAlbumMiddleware
 from aiogram_dialog import DialogManager, setup_dialogs, ShowMode, StartMode
 from aiogram_dialog.api.exceptions import UnknownIntent
 from aiogram_dialog.widgets.text import setup_jinja
 
 import config
+from hustler_bracelet.bot.dialogs.activity.choose_hiche import choose_niche_dialog
+from hustler_bracelet.bot.dialogs.activity.complete_task import complete_task_dialog
+from hustler_bracelet.bot.dialogs.activity.quit import activity_quit_dialog
+from hustler_bracelet.bot.dialogs.activity.task import activity_task_dialog
 from hustler_bracelet.bot.dialogs.finance import finance_menu_dialog
 from hustler_bracelet.bot.dialogs.finance.add_event import add_finance_event_dialog
 from hustler_bracelet.bot.dialogs.finance.categories_management import finance_categories_management_menu_dialog
@@ -108,7 +113,11 @@ dialog_router.include_routers(
     add_profit_dialog,
     rename_asset_dialog,
     change_interest_rate_dialog,
-    activity_dialog
+    activity_dialog,
+    activity_quit_dialog,
+    activity_task_dialog,
+    complete_task_dialog,
+    choose_niche_dialog
 )
 
 
@@ -140,6 +149,8 @@ async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=config.TG_BOT_TOKEN, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     dp = setup_dp()
+
+    CountCheckAlbumMiddleware(router=dp)
 
     aiogram_dialog.widgets.text.jinja.default_env = setup_jinja(dp, filters=get_jinja_filters())
 

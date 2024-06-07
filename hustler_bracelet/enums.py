@@ -6,7 +6,7 @@ class FinanceTransactionType(str, Enum):
     SPENDING = 'SPENDING'
 
 
-class CompletionStatus(str, Enum):
+class TaskCompletionStatus(str, Enum):
     PENDING = 'PENDING'
     VERIFIED = 'VERIFIED'
     REJECTED = 'REJECTED'
