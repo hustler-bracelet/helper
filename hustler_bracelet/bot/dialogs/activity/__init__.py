@@ -77,6 +77,6 @@ activity_dialog = Dialog(
         Back(Const('⬅️ Назад')),
         state=states.Activity.MAIN
     ),
-    getter=(activity_getter, current_task_getter, top_getter)
+    getter=(activity_getter, current_task_getter, top_getter),
 )
 
