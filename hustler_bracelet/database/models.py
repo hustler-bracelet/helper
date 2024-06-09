@@ -12,8 +12,8 @@ from datetime import datetime, date
 
 from hustler_bracelet.enums import (
     TaskCompletionStatus, 
-    PayoutReason, 
-    PaymentReason,
+    TransactionType,
+    TransactionStatus,
 )
 
 
@@ -40,6 +40,7 @@ class User(BaseModel):
         server_default=func.now(),
         onupdate=func.now(),
     )
+    is_admin: Mapped[bool] = mapped_column(default=False)
 
 
 class ActivityTaskCompletion(BaseModel):
@@ -60,11 +61,13 @@ class ActivityTask(BaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True, default=create_int_uid)
     niche_id: Mapped[int] = mapped_column(ForeignKey('niche.id'), nullable=True)
+    activity_id: Mapped[int] = mapped_column(ForeignKey('activity.id'), nullable=True)
     name: Mapped[str] = mapped_column(Text)
     description: Mapped[str] = mapped_column(Text)
     points: Mapped[int]
     added_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    is_running: Mapped[bool] = mapped_column(default=True)
 
 
 class Activity(BaseModel):
@@ -79,7 +82,7 @@ class Activity(BaseModel):
     occupied_places: Mapped[int] = mapped_column(default=0)
     started_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, server_default=func.now())
     deadline: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    is_running: Mapped[bool] = mapped_column(default=True)
+    is_running: Mapped[bool] = mapped_column(default=False)
 
 
 class Asset(BaseModel):
@@ -136,27 +139,6 @@ class Niche(BaseModel):
     description: Mapped[str] = mapped_column(Text)
 
 
-class Payment(BaseModel):
-    __tablename__ = 'user_payment'
-
-    id: Mapped[int] = mapped_column(primary_key=True, default=create_int_uid)
-    telegram_id: Mapped[int] = mapped_column(ForeignKey('user.telegram_id'))
-    yookassa_payment_info: Mapped[str | None]
-    payment_reason: Mapped[PaymentReason] = mapped_column(Enum(PaymentReason))
-    amount_rub: Mapped[float]
-    paid_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-
-class Payout(BaseModel):
-    __tablename__ = 'user_payout'
-
-    id: Mapped[int] = mapped_column(primary_key=True, default=create_int_uid)
-    telegram_id: Mapped[int] = mapped_column(ForeignKey('user.telegram_id'))
-    reason: Mapped[PayoutReason] = mapped_column(Enum(PayoutReason))
-    amount_rub: Mapped[float]
-    paid_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-
 class TaskCompletionProof(BaseModel):
     __tablename__ = 'task_completion_proof'
 
@@ -177,3 +159,26 @@ class Task(BaseModel):
     added_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     planned_complete_date: Mapped[date]
     is_completed: Mapped[bool] = mapped_column(default=False)
+
+
+class BraceletTransaction(BaseModel):
+    __tablename__ = "bracelet_transaction"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(ForeignKey('user.telegram_id'))
+    type: Mapped[TransactionType] = mapped_column(Enum(TransactionType))
+    status: Mapped[TransactionStatus] = mapped_column(Enum(TransactionStatus), default=TransactionStatus.PENDING, server_default='PENDING')
+    amount: Mapped[float]
+    reason: Mapped[str] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    processed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, server_default=None)
+
+
+class BraceletSubscription(BaseModel):
+    __tablename__ = "bracelet_subscription"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(ForeignKey('user.telegram_id'))
+    transaction_id: Mapped[int] = mapped_column(ForeignKey('bracelet_transaction.id'))
+    started_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    will_end_on: Mapped[datetime] = mapped_column(DateTime(timezone=True))
