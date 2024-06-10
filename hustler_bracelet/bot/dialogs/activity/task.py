@@ -8,6 +8,10 @@ from aiogram_dialog.widgets.text import Format, Jinja, Const
 from hustler_bracelet.bot.dialogs import states
 from hustler_bracelet.bot.dialogs.activity import activity_getter, activity_task_getter
 
+from hustler_bracelet.client import ActivityTasksAPIClient
+
+
+tasks_client = ActivityTasksAPIClient()
 
 # async def on_process_result(
 #         start_data: dict,
@@ -30,6 +34,23 @@ async def on_complete_activity_task_click(
             'activity_summary': data['activity_summary'],
         }
     )
+
+
+async def on_cancel_task_click(
+        callback,
+        widget,
+        dialog_manager: DialogManager
+):
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+
+    activity_summary = data['activity_summary']
+
+    await tasks_client.cancel_task(
+        user_id=callback.from_user.id,
+        task_id=activity_summary.niche.task.id,
+    )
+
+    await dialog_manager.next()
 
 
 activity_task_dialog = Dialog(
@@ -68,7 +89,11 @@ activity_task_dialog = Dialog(
         ),
         Row(
             Back(Const('⬅️ Назад')),
-            Next(Const('✅ Да, я отказываюсь'))
+            Button(
+                Const('✅ Да, я отказываюсь'),
+                id='cancel_activity_task',
+                on_click=on_cancel_task_click,
+            ),
         ),
         getter=activity_getter,
         state=states.ActivityTask.DECLINE

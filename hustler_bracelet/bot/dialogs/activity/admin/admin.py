@@ -214,7 +214,7 @@ async def add_task(callback: types.CallbackQuery, bot: Bot, state: FSMContext):
     await state.set_state(states.AdminCreateTask.CHOOSE_NICHE)
     await state.update_data(activity_id=activity_id)
 
-    activity: ActivityDataResponse = await ActivityAPIClient().get_activity_by_id(activity_id)
+    activity: ActivityDataResponse = await ActivityAPIClient().get_current_activity()
 
     kb = get_niches_kb(activity)
     text = get_new_task_text('Выбери нишу для рассылки заданий')
@@ -296,7 +296,19 @@ async def task_deadline(message: types.Message, state: FSMContext):
     )
 
     await state.clear()
-    return await view_activities(message, state)
+    await message.answer(
+        'Задание создано!',
+        reply_markup=types.InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    types.InlineKeyboardButton(
+                        text='Назад к активностям',
+                        callback_data='admin:view_activity',
+                    ),
+                ]
+            ]
+        ),
+    )
 
 
 def get_proof_text(proof: ProofLoadedReasonse) -> str:
@@ -321,7 +333,7 @@ def generate_proofs_kb(proof_id: int, pagination) -> types.InlineKeyboardMarkup:
                     ),
                     types.InlineKeyboardButton(
                         text='✅ Подтвердить',
-                        callback_data=f'admin:check_proofs:{proof_id}'
+                        callback_data=f'admin:accept_proofs:{proof_id}'
                     ),
                 ]
             ],
@@ -335,7 +347,7 @@ def generate_proofs_kb(proof_id: int, pagination) -> types.InlineKeyboardMarkup:
                 ),
                 types.InlineKeyboardButton(
                     text='✅ Подтвердить',
-                    callback_data=f'admin:check_proofs:{proof_id}'
+                    callback_data=f'admin:accept_proofs:{proof_id}'
                 ),
             ]
         ],
@@ -365,14 +377,34 @@ async def paginate_proof(callback: types.CallbackQuery, bot: Bot, state: FSMCont
     text = get_proof_text(current)
     kb = generate_proofs_kb(current.id, pagination.get_pagination_buttons())
 
-    if current.photo_ids:
-        await bot.send_media_group(
+    if len(current.photo_ids) > 1:
+        await callback.message.delete()
+        msgs = await bot.send_media_group(
             chat_id=callback.from_user.id,
-            media=current.photo_ids,
+            media=[
+                types.InputMediaPhoto(media=media_id) for media_id in current.photo_ids
+            ],
+        )
+
+        msgs_ids = [message.message_id for message in msgs]
+        await state.update_data(msgs_ids=msgs_ids)
+
+        await callback.message.answer(
+            text=text,
+            reply_markup=kb,
+        )
+        return
+
+    elif len(current.photo_ids) == 1:
+        await callback.message.delete()
+        message = await bot.send_photo(
+            chat_id=callback.from_user.id,
+            photo=current.photo_ids[0],
             caption=text,
             reply_markup=kb
         )
-        return
+
+    await callback.message.delete()
     await bot.send_message(
         chat_id=callback.from_user.id,
         text=text,
@@ -395,22 +427,38 @@ async def paginate_proofs(callback: types.CallbackQuery, bot: Bot, state: FSMCon
     text = get_proof_text(current)
     kb = generate_proofs_kb(current.id, pagination.get_pagination_buttons())
 
-    if current.photo_ids:
+    data = await state.get_data()
+    if data.get('msgs_ids'):
+        msgs_ids = data['msgs_ids']
+        await bot.delete_messages(callback.from_user.id, msgs_ids)
+        await state.update_data(msgs_ids=None)
+
+    if len(current.photo_ids) > 1:
         await callback.message.delete()
-        await bot.send_media_group(
+        messages = await bot.send_media_group(
             chat_id=callback.from_user.id,
-            media=current.photo_ids,
-            caption=text,
-            reply_markup=kb
+            media=[
+                types.InputMediaPhoto(media=media_id) for media_id in current.photo_ids
+            ],
+        )
+
+        msgs_ids = [message.message_id for message in messages]
+        await state.update_data(msgs_ids=msgs_ids)
+
+        await callback.message.answer(
+            text=text,
+            reply_markup=kb,
         )
         return
 
-    if not callback.message.media_group_id:
-        await callback.message.edit_text(
-            text=text,
+    elif len(current.photo_ids) == 1:
+        await callback.message.delete()
+        message = await bot.send_photo(
+            chat_id=callback.from_user.id,
+            photo=current.photo_ids[0],
+            caption=text,
             reply_markup=kb
         )
-        return
 
     await callback.message.delete()
     await bot.send_message(
@@ -420,7 +468,7 @@ async def paginate_proofs(callback: types.CallbackQuery, bot: Bot, state: FSMCon
     )
 
 
-@admin_router.callback_query(F.data.startswith('admin:check_proofs:'))
+@admin_router.callback_query(F.data.startswith('admin:accept_proofs:'))
 async def check_proof(callback: types.CallbackQuery, state: FSMContext):
     proof_id = int(callback.data.split(':')[-1])
 

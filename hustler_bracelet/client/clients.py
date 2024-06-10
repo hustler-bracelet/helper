@@ -72,9 +72,17 @@ class ActivityAPIClient(BaseAPIClient):
             nullable_result=True,
         )
 
-    async def get_activity_by_id(self, activity_id: int) -> ActivityDataResponse:
+    async def get_current_activity(self, activity_id: int) -> ActivityDataResponse:
         return await self.api_request(
             endpoint=f'/activities/{activity_id}',
+            method='GET',
+            schema=ActivityDataResponse,
+            nullable_result=True,
+        )
+
+    async def get_current_activity(self) -> ActivityDataResponse:
+        return await self.api_request(
+            endpoint=f'/activities/current',
             method='GET',
             schema=ActivityDataResponse,
             nullable_result=True,
@@ -110,6 +118,8 @@ class ActivityTasksAPIClient(BaseAPIClient):
         data = activity_task.model_dump()
         data['deadline'] = data['deadline'].isoformat()
 
+        print(data)
+
         return await self.api_request(
             endpoint=f'/niches/{niche_id}/tasks',
             method='POST',
@@ -122,6 +132,14 @@ class ActivityTasksAPIClient(BaseAPIClient):
             endpoint=f'/tasks/{task_id}/status',
             method='GET',
             schema=ActivityTaskStatus,
+            data={'telegram_id': user_id},
+        )
+
+    async def cancel_task(self, user_id: int, task_id: int):
+        await self.api_request(
+            endpoint=f'/tasks/{task_id}/cancel',
+            method='POST',
+            schema=None,
             data={'telegram_id': user_id},
         )
 

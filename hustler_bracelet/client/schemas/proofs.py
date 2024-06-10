@@ -8,7 +8,7 @@ from .activities import ActivityTaskDataResponse
 
 class ProofResponse(BaseModel):
     id: int
-    photo_ids: list[int]
+    photo_ids: list[str]
     caption: str
     sent_on: datetime
 
@@ -27,5 +27,5 @@ class ProofLoadedReasonse(ProofResponse):
 class ProofCreate(BaseModel):
     user_id: int
     task_id: int
-    photo_ids: list[int] | None
+    photo_ids: list[str] | None
     caption: str

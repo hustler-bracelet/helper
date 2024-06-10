@@ -32,7 +32,7 @@ async def on_start_activity_dialog(start_data: dict, manager: DialogManager):
     # отправляем на этап выбора ниши, если она не установлена
     if not activity_summary:
         # NOTE: получаем общую информациюю о активности
-        activity = await activity_client.get_activity_by_id(activity_id)
+        activity = await activity_client.get_current_activity()
         await manager.start(states.ActivityOnboarding.MAIN, data={'activity': activity})
         return
 
@@ -58,6 +58,10 @@ async def on_current_task_click(
 ):
     data = dialog_manager.dialog_data or dialog_manager.start_data
     activity_summary: ActivitySummaryResponse = data.get('activity_summary')
+
+    if not activity_summary.niche.task:
+        await callback.answer('Нет активных задач', show_alert=True)
+        return
 
     result = await tasks_client.get_status_for_user(
         user_id=dialog_manager.event.from_user.id,
@@ -86,8 +90,8 @@ async def top_getter(dialog_manager: DialogManager, **kwargs):
     activity_summary: ActivitySummaryResponse = data.get('activity_summary')
 
     return {
-        "points": activity_summary.leaderboard_data.points if activity_summary.leaderboard_data else 0,
-        "current_top_position": activity_summary.leaderboard_data.position if activity_summary.leaderboard_data else 0
+        "points": activity_summary.user_leaderboard_data.points if activity_summary.user_leaderboard_data else 0,
+        "current_top_position": activity_summary.user_leaderboard_data.position if activity_summary.user_leaderboard_data else 0
     }
 
 
@@ -97,12 +101,12 @@ async def activity_task_getter(dialog_manager: DialogManager, **kwargs):
     activity_summary: ActivitySummaryResponse = data.get('activity_summary')
 
     return {
-        'task_name': activity_summary.niche.task.name,
+        'task_name': activity_summary.niche.task.name if activity_summary.niche.task else '-',
         'task_emoji': '',
-        'task_caption': activity_summary.niche.task.description,
-        'task_sent_at': activity_summary.niche.task.added_on,
-        'task_deadline': activity_summary.niche.task.deadline,
-        'task_reward_points': activity_summary.niche.task.points,  # TODO: Уточнить, только ли баллы могут быть в награде
+        'task_caption': activity_summary.niche.task.description if activity_summary.niche.task else '-',
+        'task_sent_at': activity_summary.niche.task.added_on if activity_summary.niche.task else None,
+        'task_deadline': activity_summary.niche.task.deadline if activity_summary.niche.task else None,
+        'task_reward_points': activity_summary.niche.task.points if activity_summary.niche.task else 0,  # TODO: Уточнить, только ли баллы могут быть в награде
         'people_completed_task_amount': 0,  # TODO: добавить в саммари блять 
     }
 
@@ -120,11 +124,11 @@ async def activity_getter(dialog_manager: DialogManager, **kwargs):
         "activity_fund": activity_summary.fund,
         "activity_places": activity_summary.total_places,
         "current_niche": f"{activity_summary.niche.emoji} {activity_summary.niche.name}",
-        "current_points_balance": activity_summary.leaderboard_data.points if activity_summary.leaderboard_data else 0,
-        "current_top_position": activity_summary.leaderboard_data.top_position if activity_summary.leaderboard_data else 0,
-        "task_name": {activity_summary.niche.task.name},
-        "task_reward_points": {activity_summary.niche.task.points},
-        "task_deadline": {activity_summary.niche.task.deadline},
+        "current_points_balance": activity_summary.user_leaderboard_data.points if activity_summary.user_leaderboard_data else 0,
+        "current_top_position": activity_summary.user_leaderboard_data.position if activity_summary.user_leaderboard_data else 0,
+        "task_name": {activity_summary.niche.task.name if activity_summary.niche.task else '-'},
+        "task_reward_points": {activity_summary.niche.task.points if activity_summary.niche.task else 0},
+        "task_deadline": {activity_summary.niche.task.deadline  if activity_summary.niche.task else None},
     }
 
 

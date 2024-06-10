@@ -55,12 +55,14 @@ async def message_handler(
         message_input: MessageInput,
         manager: DialogManager,
 ):
-    caption = message.text
+    caption = message.text or message.caption
+
+    photo_ids = [message.photo[-1].file_id] if message.photo else []
 
     await proofs_client.create_proof(ProofCreate(
         user_id=message.from_user.id,
         task_id=manager.dialog_data.get('activity_summary').niche.task.id,
-        photo_ids=[],
+        photo_ids=photo_ids,
         caption=caption
     ))
 
