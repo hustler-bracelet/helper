@@ -8,3 +8,5 @@ psycopg2
 alembic
 aiogram_album
 cachetools
+aiohttp
+pytz

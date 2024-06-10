@@ -6,6 +6,17 @@ from aiogram_dialog.widgets.kbd import Cancel, Button
 from aiogram_dialog.widgets.text import Const
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.client import ProofsAPIClient
+from hustler_bracelet.client.schemas import ProofCreate, ProofResponse, ActivitySummaryResponse
+
+
+proofs_client = ProofsAPIClient()
+
+
+async def on_dialog_start(start_data, manager: DialogManager):
+    manager.dialog_data.update({
+        'activity_summary': start_data.get('activity_summary'),
+    })
 
 
 async def on_done_click(
@@ -21,14 +32,21 @@ async def media_group_handler(
         message_input: MessageInput,
         manager: DialogManager,
 ):
-    messages_ids = [*map(lambda msg: msg.message_id, message.messages)]  # Это у каждого сообщения своё
-    media_group_id = message.media_group_id  # Это общая хуйня
+    activity: ActivitySummaryResponse = manager.dialog_data.get('activity_summary')
+    photo_ids = [
+        message.photo[-1].file_id
+        for message in message.messages
+        if message.photo
+    ]
+    caption = message.caption
 
-    # await message.bot.copy_messages(  # Это чисто для меня, не обращай внимания
-    #     message.from_user.id,  # В какой чат слать (амби)
-    #     message.from_user.id,  # Из какого чата копируем сообщения
-    #     messages_ids
-    # )
+    await proofs_client.create_proof(ProofCreate(
+        user_id=message.from_user.id,
+        task_id=activity.niche.task.id,
+        photo_ids=photo_ids,
+        caption=caption
+    ))
+
     await manager.next()
 
 
@@ -37,10 +55,15 @@ async def message_handler(
         message_input: MessageInput,
         manager: DialogManager,
 ):
-    # Это альтернатива mediagroup_handler. Нужно что-то взять вместо media_group_id, чтобы поведение было консистентным
-    # Судя по разнице в длине айдишников сообщений и медиагрупп, коллизий между ними не бывает, так что можно просто взять message_id
-    message_id = message.message_id
-    # media_group_id = message_id ???
+    caption = message.text
+
+    await proofs_client.create_proof(ProofCreate(
+        user_id=message.from_user.id,
+        task_id=manager.dialog_data.get('activity_summary').niche.task.id,
+        photo_ids=[],
+        caption=caption
+    ))
+
     await manager.next()
 
 
@@ -71,5 +94,6 @@ complete_task_dialog = Dialog(
         ),
         Cancel(Const('✅ Готово'), on_click=on_done_click),
         state=states.ActivityTaskCompletion.FINAL
-    )
+    ),
+    on_start=on_dialog_start,
 )

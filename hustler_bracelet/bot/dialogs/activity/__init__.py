@@ -6,17 +6,39 @@ from typing import Any
 
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.kbd import Start, Back, Cancel, Next, ScrollingGroup, Select
+from aiogram_dialog.widgets.kbd import Start, Back, Cancel, Next, ScrollingGroup, Select, Button
 from aiogram_dialog.widgets.text import Format, Const, Jinja
 
 from hustler_bracelet.bot.dialogs import states
+from hustler_bracelet.client.schemas.activities import ActivitySummaryResponse
 from hustler_bracelet.managers import FinanceManager
+
+from hustler_bracelet.client import ActivityAPIClient, NichesAPIClient, ActivityTasksAPIClient
+from hustler_bracelet.client.schemas import ActivityDataResponse, NicheDataResponse, ActivitySummaryResponse, ActivityTaskStatus
+
+
+activity_client = ActivityAPIClient()
+niche_client = NichesAPIClient()
+tasks_client = ActivityTasksAPIClient()
 
 
 async def on_start_activity_dialog(start_data: dict, manager: DialogManager):
-    if True:  # random.randint(0, 1):  # Если ниша не выбрана
-        await manager.start(states.ActivityOnboarding.MAIN)
+    user_id = manager.event.from_user.id
+    activity_id = start_data['activity_id']
+
+    # NOTE: получаем информацию о активности для пользователя
+    activity_summary: ActivitySummaryResponse | None = await activity_client.get_activity_user_summary(user_id, activity_id)
+
+    # отправляем на этап выбора ниши, если она не установлена
+    if not activity_summary:
+        # NOTE: получаем общую информациюю о активности
+        activity = await activity_client.get_activity_by_id(activity_id)
+        await manager.start(states.ActivityOnboarding.MAIN, data={'activity': activity})
         return
+
+    manager.dialog_data.update({
+        'activity_summary': activity_summary,
+    })
 
 
 async def on_process_result(
@@ -29,64 +51,113 @@ async def on_process_result(
         return
 
 
+async def on_current_task_click(
+        callback: CallbackQuery,
+        widget: Any,
+        dialog_manager: DialogManager
+):
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+    activity_summary: ActivitySummaryResponse = data.get('activity_summary')
+
+    result = await tasks_client.get_status_for_user(
+        user_id=dialog_manager.event.from_user.id,
+        task_id=activity_summary.niche.task.id
+    )
+
+    if result.already_done:
+        await callback.answer('Вы уже выполнили эту задачу', show_alert=True)
+        return
+
+    if not result.can_do_task:
+        await callback.answer('Вы не можете выполнять эту задачу', show_alert=True)
+        return
+
+    await dialog_manager.start(
+        states.ActivityTask.MAIN, 
+        data={
+            'activity_summary': dialog_manager.dialog_data['activity_summary'],
+        }
+    )
+
+
 async def top_getter(dialog_manager: DialogManager, **kwargs):
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+
+    activity_summary: ActivitySummaryResponse = data.get('activity_summary')
+
     return {
-        "points": 20,
-        "current_top_position": 18
+        "points": activity_summary.leaderboard_data.points if activity_summary.leaderboard_data else 0,
+        "current_top_position": activity_summary.leaderboard_data.position if activity_summary.leaderboard_data else 0
     }
 
 
 async def activity_task_getter(dialog_manager: DialogManager, **kwargs):
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+
+    activity_summary: ActivitySummaryResponse = data.get('activity_summary')
+
     return {
-        'task_name': 'Слить все токены',
-        'task_emoji': '⚡️',
-        'task_caption': 'Этот броуски больше не любит Пашу Дурова',
-        'task_sent_at': datetime.datetime.now(),
-        'task_deadline': datetime.datetime.now() + datetime.timedelta(days=10),
-        'task_reward_points': 4,  # TODO: Уточнить, только ли баллы могут быть в награде
-        'people_completed_task_amount': 22 * random.randint(0, 1),
+        'task_name': activity_summary.niche.task.name,
+        'task_emoji': '',
+        'task_caption': activity_summary.niche.task.description,
+        'task_sent_at': activity_summary.niche.task.added_on,
+        'task_deadline': activity_summary.niche.task.deadline,
+        'task_reward_points': activity_summary.niche.task.points,  # TODO: Уточнить, только ли баллы могут быть в награде
+        'people_completed_task_amount': 0,  # TODO: добавить в саммари блять 
     }
 
 
 async def activity_getter(dialog_manager: DialogManager, **kwargs):
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+
+    activity_summary: ActivitySummaryResponse = data.get('activity_summary')
+
     return {
-        "activity_name": "💰 Сезон крипты",
-        "activity_description": "Ну что, хаслеры, время пампить, дампить, хуямпить, МММ’ить, и регулировать стаканы!\n"
-                                "Выбирай свою нишу и вперёд жарить стейкинги!",
-        "activity_launched_at": datetime.datetime.now(),
-        "activity_deadline": datetime.datetime.now() + datetime.timedelta(days=10),
-        "activity_fund": 100_000,
-        "activity_places": 20,
-        "current_niche": "TON staker",
-        "current_points_balance": 18,
+        "activity_name": f"{activity_summary.emoji} {activity_summary.name}",
+        "activity_description": activity_summary.description,
+        "activity_launched_at": activity_summary.started_on,
+        "activity_deadline": activity_summary.deadline,
+        "activity_fund": activity_summary.fund,
+        "activity_places": activity_summary.total_places,
+        "current_niche": f"{activity_summary.niche.emoji} {activity_summary.niche.name}",
+        "current_points_balance": activity_summary.leaderboard_data.points if activity_summary.leaderboard_data else 0,
+        "current_top_position": activity_summary.leaderboard_data.top_position if activity_summary.leaderboard_data else 0,
+        "task_name": {activity_summary.niche.task.name},
+        "task_reward_points": {activity_summary.niche.task.points},
+        "task_deadline": {activity_summary.niche.task.deadline},
     }
 
 
 async def activity_top_getter(dialog_manager: DialogManager, **kwargs):
-    return {
-        'top': [
-            ('Дмитрий', 20, 20233.27, False),
-            ('Farel', 20, 16186.62, False),
-            ('Игорь', 18, 12949, False),
-            ('ambienthugg', 18, 10359.44, True),
-            ('Женьчик', 18, 8287.55, False),
-            ('Работает Артур', 18, 6630.04, False),
-            ('Vladimir', 16, 5304.03, False),
-            ('CHVS', 16, 4243.23, False),
-            ('Honex', 16, 3394.58, False),
-            ('Kirill Usenko', 14, 2715.66, False),
-            ('Jesus', 12, 2172.53, False),
-            ('Споки | 1k ROI', 10, 1738.02, False),
-            ('Tony', 10, 1390.42, False),
-            ('Влад', 8, 1112.34, False),
-            ('Сергей', 8, 889.87, False),
-            ('Kartright', 6, 711.90, False),
-            ('Jesus', 4, 569.52, False),
-            ('Yankee', 4, 455.61, False),
-            ('Igor', 2, 364.49, False),
-            ('Un/tilt/ed', 2, 291.59, False)
-        ]
-    }
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+
+    activity_summary: ActivitySummaryResponse = data.get('activity_summary')
+
+    if not activity_summary.leaderboard_data:
+        return []
+
+    return [
+        (
+            data.user.telegram_name, 
+            data.position, 
+            data.points, 
+            data.user.telegram_id == dialog_manager.event.from_user.id
+        )
+        for data in activity_summary.leaderboard_data
+    ]
+
+
+async def on_exit_activity_click(
+    callback,
+    button,
+    manager: DialogManager,
+):
+    await manager.start(
+        states.ActivityQuit.MAIN,
+        data={
+            'activity_summary': manager.dialog_data['activity_summary'],
+        }
+    )
 
 
 activity_dialog = Dialog(
@@ -107,23 +178,23 @@ activity_dialog = Dialog(
             "👉 <b>Текущее задание:</b> {{task_name}} ({{task_reward_points|plural(['балл', 'балла', 'баллов'])}})\n"
             "🕐 <b>Выполнить до:</b> {{task_deadline|datetime}}"
         ),
-        Start(
+        Button(
             Const('✅ Текущее задание'),
             id='current_task_btn',
-            state=states.ActivityTask.MAIN
+            on_click=on_current_task_click,
         ),
         Next(
             Const('🏆 Топ участников'),
-            id='activity_top_btn'
+            id='activity_top_btn',
         ),
-        Start(
+        Button(
             Const('❌ Выйти с активности (сдаться)'),
             id='activity_quit_btn',
-            state=states.ActivityQuit.MAIN
+            on_click=on_exit_activity_click,
         ),
         Cancel(Const('⬅️ Назад')),
         state=states.Activity.MAIN,
-        getter=(activity_getter, activity_task_getter, top_getter)
+        getter=(activity_getter, activity_task_getter, top_getter),
     ),
     Window(
         Jinja(
@@ -141,11 +212,11 @@ activity_dialog = Dialog(
             '{{ i+1 }}. <b>{% if item[3] %}👉🏻 {% endif %}{{ item[0] }}</b> — {{ item[1] }} баллов — <b>{{ item[2] }}₽{% if item[3] %} 👈🏻{% endif %}</b>\n'
             '    {% endif %}\n'
             '{% endfor %}'
-        ),
+            ),
         Back(Const('⬅️ Назад')),
         state=states.Activity.TOP,
         getter=activity_top_getter,
     ),
     on_start=on_start_activity_dialog,
-    on_process_result=on_process_result
+    on_process_result=on_process_result,
 )

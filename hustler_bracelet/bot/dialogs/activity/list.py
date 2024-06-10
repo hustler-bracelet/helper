@@ -8,12 +8,28 @@ from aiogram_dialog.widgets.text import Const, Format
 
 from hustler_bracelet.bot.dialogs import states
 
+from hustler_bracelet.client import ActivityAPIClient
+from hustler_bracelet.client.schemas import ActivityDataResponse
+
+
+client = ActivityAPIClient()
+
+
+async def on_start_list_activity(start_data: dict, dialog_manager: DialogManager):
+    activities = await client.get_activities(is_active=True)
+
+    dialog_manager.dialog_data.update({
+        'activities': activities
+    })
+
 
 async def activities_list_getter(dialog_manager: DialogManager, **kwargs):
+    activities: list[ActivityDataResponse] = dialog_manager.dialog_data['activities']
+
     return {
         'activities': [
-            ('мешок денег', 'Сезон крипты', 0),  # emoji, name, id
-            ('солнышко', 'Летний хасл жесть', 1)
+            (activity.emoji, activity.name, activity.id)
+            for activity in activities
         ]
     }
 
@@ -24,6 +40,24 @@ async def on_choose_activity(
         manager: DialogManager,
         item_id: int
 ):
+    activity_id = item_id
+    user_id = callback.from_user.id
+
+    result = await client.activity_status(activity_id, user_id)
+
+    if not result.already_joined:
+        if not result.is_running:
+            await callback.answer('Данная активность уже закончилась.', show_alert=True)
+            return
+
+        elif result.occupied_places == result.total_places:
+            await callback.answer('Данная активность переполнена.', show_alert=True)
+            return
+
+        elif result.can_join is False:
+            await callback.answer('Вы покинули данную активность.', show_alert=True)
+            return
+
     await manager.start(
         states.Activity.MAIN,
         {'activity_id': item_id}  # dialog_manager.start_data['activity_id']
@@ -50,4 +84,5 @@ activities_list_dialog = Dialog(
         state=states.ActivitiesList.MAIN,
         getter=activities_list_getter
     ),
+    on_start=on_start_list_activity,
 )

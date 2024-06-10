@@ -6,7 +6,7 @@ class FinanceTransactionType(str, Enum):
     SPENDING = 'SPENDING'
 
 
-class TaskCompletionStatus(str, Enum):
+class ProofCompletionStatus(str, Enum):
     PENDING = 'PENDING'
     VERIFIED = 'VERIFIED'
     REJECTED = 'REJECTED'
@@ -21,3 +21,25 @@ class PayoutReason(str, Enum):
 class PaymentReason(str, Enum):
     BRACELET = 'BRACELET'
     OTHER = 'OTHER'
+
+
+class TransactionType(str, Enum):
+    INCOME = 'INCOME'
+    OUTCOME = 'OUTCOME'
+
+
+class TransactionStatus(str, Enum):
+    PENDING = 'PENDING'
+    SUCCESS = 'SUCCESS'
+    FAILED = 'FAILED'
+    DECLINED = 'DECLINED'
+
+
+class ActivityUserEventType(str, Enum):
+    JOIN = 'JOIN'
+    LEAVE = 'LEAVE'
+
+
+class ActivityTaskUserEventType(str, Enum):
+    JOIN = 'JOIN'
+    LEAVE = 'LEAVE'

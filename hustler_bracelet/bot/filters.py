@@ -29,3 +29,8 @@ class SubChecker(BaseFilter):
             'По техническим вопросам - @d_nsdkin / @farel106'
         )
         return False
+
+
+class AdminFilter(BaseFilter):
+    async def __call__(self, user_created, bot: Bot) -> bool:
+        return user_created.is_admin

@@ -16,6 +16,22 @@ from hustler_bracelet.bot.dialogs.activity import activity_getter, activity_task
 # ):
 #     pass
 
+
+async def on_complete_activity_task_click(
+        callback,
+        widget,
+        dialog_manager: DialogManager
+):
+    data = dialog_manager.dialog_data or dialog_manager.start_data
+
+    await dialog_manager.start(
+        states.ActivityTaskCompletion.MAIN,
+        data={
+            'activity_summary': data['activity_summary'],
+        }
+    )
+
+
 activity_task_dialog = Dialog(
     Window(
         Jinja(
@@ -33,10 +49,10 @@ activity_task_dialog = Dialog(
             '{% endif %}'
         ),
         Row(
-            Start(
+            Button(
                 Const('✅ Выполнить'),
                 id='complete_activity_task',
-                state=states.ActivityTaskCompletion.MAIN
+                on_click=on_complete_activity_task_click,
             ),
             Next(Const('❌ Отказаться'), id='decline_activity_task'),
         ),

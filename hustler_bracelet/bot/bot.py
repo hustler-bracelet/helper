@@ -45,6 +45,7 @@ from hustler_bracelet.bot.dialogs.activity import activity_dialog
 from hustler_bracelet.bot.filters import SubChecker
 from hustler_bracelet.bot.middlewares import database_middleware
 from hustler_bracelet.bot.utils.lang_utils import get_jinja_filters
+from hustler_bracelet.bot.dialogs.activity.admin import admin_router
 from .dialogs import states
 
 
@@ -132,6 +133,8 @@ def setup_dp():
         on_unknown_intent,
         ExceptionTypeFilter(UnknownIntent),
     )
+
+    dp.include_router(admin_router)
 
     dp.message.middleware.register(database_middleware)
     dp.callback_query.middleware.register(database_middleware)
