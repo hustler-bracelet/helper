@@ -121,6 +121,15 @@ class ActivityTasksAPIClient(BaseAPIClient):
             schema=ActivityTaskDataResponse,
         )
 
+    async def get_all_tasks(self, user_id: int, niche_id: int) -> list[ActivityTaskDataResponse]:
+        return await self.api_request(
+            endpoint=f'/niches/{niche_id}/tasks',
+            method='GET',
+            schema=ActivityTaskDataResponse,
+            many_result=True,
+            data={'telegram_id': user_id},
+        )
+
     async def create_new_task(self, niche_id: int, activity_task: ActivityTaskCreateData) -> ActivityTaskDataResponse:
         data = activity_task.model_dump()
         data['deadline'] = data['deadline'].isoformat()
