@@ -151,7 +151,7 @@ async def on_back_to_activity_click(
     await dialog_manager.start(
         states.Activity.MAIN,
         data={
-            'activity_summary': dialog_manager.dialog_data['activity_summary'],
+            'activity_id': dialog_manager.dialog_data['activity_summary'].id,
         }
     )
 
