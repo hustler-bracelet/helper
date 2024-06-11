@@ -8,5 +8,8 @@ DB_PASS = os.getenv('DB_PASS')
 DB_NAME = os.getenv('DB_NAME')
 DB_PORT = os.getenv('DB_PORT')
 
-VERSION = '1.1.0(postgresql)'
-UPDATE_TIME = '22 мая 2024'
+API_BASE_URL = os.getenv('API_BASE_URL')
+WEB_APP_URL = os.getenv('WEB_APP_URL')
+
+VERSION = '1.3.0(postgresql)'
+UPDATE_TIME = '6 июня 2024'

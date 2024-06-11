@@ -123,6 +123,8 @@ def represent_date(date: datetime.date) -> str:
 
 
 def represent_datetime(datetime: datetime.datetime) -> str:
+    if not datetime:
+        return '-'
     return f'{represent_date(datetime.date())} ({datetime.time().strftime("%H:%M")} МСК)'
 
 

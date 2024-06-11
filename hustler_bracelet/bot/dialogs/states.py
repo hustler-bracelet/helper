@@ -185,3 +185,11 @@ class LaunchActivity(StatesGroup):
     MAIN = State()
     CONFIRM_LAUNCH = State()
     FINAL = State()
+
+
+class AdminCreateTask(StatesGroup):
+    CHOOSE_NICHE = State()
+    TASK_NAME = State()
+    TASK_TEXT = State()
+    TASK_POINTS = State()
+    TASK_DEADLINE = State()
