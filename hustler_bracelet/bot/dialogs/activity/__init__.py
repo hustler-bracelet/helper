@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from math import floor
 import operator
 import random
 from typing import Any
@@ -150,8 +151,8 @@ async def activity_top_getter(dialog_manager: DialogManager, **kwargs):
         'top': [
             (
                 data.user.telegram_name, 
-                data.position, 
                 data.points, 
+                floor(data.earn.sum),
                 data.user.telegram_id == dialog_manager.event.from_user.id,
             )
             for data in activity_summary.leaderboard_data
