@@ -18,7 +18,14 @@ from .utils import SimplePagination
 WEB_APP_URL = config.WEB_APP_URL
 
 
+from hustler_bracelet.bot.filters import AdminFilter
+
+
 admin_router = Router()
+
+admin_router.callback_query.filter(AdminFilter())
+admin_router.message.filter(AdminFilter())
+
 activity_client = ActivityAPIClient()
 activity_task_client = ActivityTasksAPIClient()
 proofs_client = ProofsAPIClient()
