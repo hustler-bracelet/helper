@@ -140,6 +140,12 @@ async def activity_top_getter(dialog_manager: DialogManager, **kwargs):
     if not activity_summary.leaderboard_data:
         return []
 
+    activity_summary.leaderboard_data = sorted(
+        activity_summary.leaderboard_data, 
+        key=lambda x: x.points, 
+        reverse=True
+    )
+
     return {
         'top': [
             (
