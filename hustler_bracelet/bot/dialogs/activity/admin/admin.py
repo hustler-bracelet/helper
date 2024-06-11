@@ -60,13 +60,14 @@ async def on_admin_command(message: types.Message, bot: Bot):
     )
 
 
-def get_webapp_kb() -> types.InlineKeyboardMarkup:
+def get_webapp_kb(telegram_id: int) -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 types.InlineKeyboardButton(
                     text='Открыть форму',
-                    web_app=types.WebAppInfo(url=WEB_APP_URL)
+                    web_app=types.WebAppInfo(
+                        url=f'{WEB_APP_URL}?telegram_id={telegram_id}')
                 ),
             ],
         ]
@@ -516,4 +517,25 @@ async def stop_activity(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(
         text=text,
         reply_markup=kb
+    )
+
+
+@admin_router.callback_query(F.data.startswith('admin:activity:run:'))
+async def start_activity(callback: types.CallbackQuery, state: FSMContext):
+    activity_id = int(callback.data.split(':')[-1])
+
+    await activity_client.run_activity(activity_id)
+
+    await callback.message.edit_text(
+        '✅ Активность запущена',
+        reply_markup=types.InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    types.InlineKeyboardButton(
+                        text='✅ Ок',
+                        callback_data=f'admin:view_activity'
+                    ),
+                ]
+            ]
+        )
     )

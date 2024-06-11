@@ -64,6 +64,13 @@ class ActivityAPIClient(BaseAPIClient):
             schema=None,
         )
 
+    async def run_activity(self, activity_id: int):
+        await self.api_request(
+            endpoint=f'/activities/{activity_id}/run',
+            method='POST',
+            schema=None,
+        )
+
     async def get_activity_user_summary(self, user_id: int, activity_id: int) -> ActivitySummaryResponse:
         return await self.api_request(
             endpoint=f'/users/{user_id}/activities/{activity_id}/summary',
