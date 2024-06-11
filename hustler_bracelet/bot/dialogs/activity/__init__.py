@@ -140,15 +140,17 @@ async def activity_top_getter(dialog_manager: DialogManager, **kwargs):
     if not activity_summary.leaderboard_data:
         return []
 
-    return [
-        (
-            data.user.telegram_name, 
-            data.position, 
-            data.points, 
-            data.user.telegram_id == dialog_manager.event.from_user.id
-        )
-        for data in activity_summary.leaderboard_data
-    ]
+    return {
+        'top': [
+            (
+                data.user.telegram_name, 
+                data.position, 
+                data.points, 
+                data.user.telegram_id == dialog_manager.event.from_user.id,
+            )
+            for data in activity_summary.leaderboard_data
+        ]
+    }
 
 
 async def on_exit_activity_click(
