@@ -26,6 +26,10 @@ async def main_dialog_getter(dialog_manager: DialogManager, **kwargs):
 async def on_event_click(callback, _, manager: DialogManager):
     activity = await activity_client.get_current_activity()
 
+    if activity is None:
+        await callback.answer('Сейчас нет активных задач.', show_alert=True)
+        return
+
     status = await activity_client.activity_status(
         activity_id=activity.id,
         user_id=manager.event.from_user.id,
