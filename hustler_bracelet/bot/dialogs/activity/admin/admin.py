@@ -362,11 +362,19 @@ def generate_proofs_kb(proof_id: int, pagination) -> types.InlineKeyboardMarkup:
 async def paginate_proof(callback: types.CallbackQuery, bot: Bot, state: FSMContext):
     await callback.message.edit_reply_markup(reply_markup=None)
 
-    activity_id = callback.data.split(':')[-1]
+    if callback.data.startswith('admin:check_proofs'):
+        activity_id = callback.data.split(':')[-1]
+    else:
+        data = await state.get_data()
+        activity_id = data['activity_id']
 
     await state.update_data(activity_id=activity_id)
 
     proofs: list[ProofLoadedReasonse] = await proofs_client.get_proofs_waitlist(activity_id)
+
+    if not proofs:
+        await callback.answer('Доказательств нет')
+        return await view_activities(callback, state)
 
     await state.update_data(proofs=proofs)
 
@@ -472,21 +480,25 @@ async def paginate_proofs(callback: types.CallbackQuery, bot: Bot, state: FSMCon
 
 
 @admin_router.callback_query(F.data.startswith('admin:accept_proofs:'))
-async def check_proof(callback: types.CallbackQuery, state: FSMContext):
+async def check_proof(callback: types.CallbackQuery, bot, state: FSMContext):
     proof_id = int(callback.data.split(':')[-1])
 
     await proofs_client.accept_proof(proof_id)
 
     await callback.answer('✅ Подтверждено', show_alert=True)
 
+    return await paginate_proof(callback, bot, state)
+
 
 @admin_router.callback_query(F.data.startswith('admin:reject_proofs:'))
-async def check_proof(callback: types.CallbackQuery, state: FSMContext):
+async def check_proof(callback: types.CallbackQuery, bot, state: FSMContext):
     proof_id = int(callback.data.split(':')[-1])
 
     await proofs_client.decline_proof(proof_id)
 
     await callback.answer('❌ Отклонено', show_alert=True)
+
+    return await paginate_proof(callback, bot, state)
 
 
 @admin_router.callback_query(F.data.startswith('admin:confirm_stop_activity:'))
@@ -522,7 +534,7 @@ async def stop_activity(callback: types.CallbackQuery, state: FSMContext):
     )
 
 
-@admin_router.callback_query(F.data.startswith('admin:activity:run:'))
+@admin_router.callback_query(F.data.startswith('admin:activity_run:'))
 async def start_activity(callback: types.CallbackQuery, state: FSMContext):
     activity_id = int(callback.data.split(':')[-1])
 

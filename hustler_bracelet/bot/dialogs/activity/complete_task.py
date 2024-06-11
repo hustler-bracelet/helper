@@ -44,7 +44,7 @@ async def media_group_handler(
         user_id=message.from_user.id,
         task_id=activity.niche.task.id,
         photo_ids=photo_ids,
-        caption=caption
+        caption=caption or '-'
     ))
 
     await manager.next()
@@ -63,7 +63,7 @@ async def message_handler(
         user_id=message.from_user.id,
         task_id=manager.dialog_data.get('activity_summary').niche.task.id,
         photo_ids=photo_ids,
-        caption=caption
+        caption=caption or '-'
     ))
 
     await manager.next()

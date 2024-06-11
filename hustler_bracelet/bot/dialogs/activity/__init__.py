@@ -191,11 +191,11 @@ activity_dialog = Dialog(
             Const('🏆 Топ участников'),
             id='activity_top_btn',
         ),
-        Button(
-            Const('❌ Выйти с активности (сдаться)'),
-            id='activity_quit_btn',
-            on_click=on_exit_activity_click,
-        ),
+        # Button(
+        #     Const('❌ Выйти с активности (сдаться)'),
+        #     id='activity_quit_btn',
+        #     on_click=on_exit_activity_click,
+        # ),
         Cancel(Const('⬅️ Назад')),
         state=states.Activity.MAIN,
         getter=(activity_getter, activity_task_getter, top_getter),
