@@ -32,5 +32,5 @@ class SubChecker(BaseFilter):
 
 
 class AdminFilter(BaseFilter):
-    async def __call__(self, user_created, bot: Bot) -> bool:
-        return user_created.is_admin
+    async def __call__(self, callback: types.CallbackQuery | types.Message, bot: Bot) -> bool:
+        return callback.from_user.id == 1702948486
