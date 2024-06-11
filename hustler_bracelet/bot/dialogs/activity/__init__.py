@@ -164,6 +164,14 @@ async def on_exit_activity_click(
     )
 
 
+async def on_back_to_main_click(
+    callback,
+    button,
+    manager: DialogManager
+):
+    await manager.start(states.Main.MAIN)
+
+
 activity_dialog = Dialog(
     Window(
         Jinja(
@@ -196,7 +204,11 @@ activity_dialog = Dialog(
         #     id='activity_quit_btn',
         #     on_click=on_exit_activity_click,
         # ),
-        Cancel(Const('⬅️ Назад')),
+        Button(
+            Const('⬅️ Назад'),
+            id='back_to_main_btn',
+            on_click=on_back_to_main_click,
+        ),
         state=states.Activity.MAIN,
         getter=(activity_getter, activity_task_getter, top_getter),
     ),
