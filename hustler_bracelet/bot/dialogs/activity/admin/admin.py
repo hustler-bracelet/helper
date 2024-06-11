@@ -79,7 +79,9 @@ async def create_activity(callback: types.CallbackQuery, bot: Bot):
     await callback.message.edit_text(
         '⚡️ Запуск активности\n\n'
         'Заполни форму в веб-аппке:', 
-        reply_markup=get_webapp_kb()
+        reply_markup=get_webapp_kb(
+            callback.from_user.id,
+        )
     )
 
 # TODO: тут надо подумать над вебаппом
