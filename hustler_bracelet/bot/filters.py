@@ -33,4 +33,4 @@ class SubChecker(BaseFilter):
 
 class AdminFilter(BaseFilter):
     async def __call__(self, callback: types.CallbackQuery | types.Message, bot: Bot) -> bool:
-        return callback.from_user.id == 1702948486
+        return (callback.from_user.id == 1702948486) or (callback.from_user.id == 404161836)
