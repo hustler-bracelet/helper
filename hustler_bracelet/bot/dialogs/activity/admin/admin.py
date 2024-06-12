@@ -120,13 +120,19 @@ def get_activity_kb(activity: ActivityDataResponse, pagination) -> types.InlineK
                 [
                     types.InlineKeyboardButton(
                         text='➕ Разослать задание',
-                        callback_data=f'admin:view_activity:{activity.id}',
+                        callback_data=f'admin:add_task:{activity.id}',
                     ),
+                ],
+                            [
+                types.InlineKeyboardButton(
+                    text='📝 Посмотреть пруфы',
+                    callback_data=f'admin:check_proofs:{activity.id}',
+                ),
                 ],
                 [
                     types.InlineKeyboardButton(
-                        text='Посмотреть пруфы',
-                        callback_data=f'admin:main:{activity.id}',
+                        text='❌ Остановить активность',
+                        callback_data=f'admin:stop_activity:{activity.id}',
                     ),
                 ]
             ]

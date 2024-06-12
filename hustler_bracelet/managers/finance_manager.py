@@ -153,21 +153,21 @@ class FinanceManager:
             select(Category).where(Category.id == int(id_))
         )).first()
 
-        self._session.add(
-            Activity(
-                id=create_int_uid(),
-                name='abobus',
-                emoji='💰',
-                description='иди нахуй пон',
-                fund=20000,
-                total_places=20,
-                occupied_places=0,
-                started_on=datetime.now(),
-                deadline=datetime.now() + timedelta(days=14),
-                is_running=True
-            )
-        )
-        await self._session.commit()
+        # self._session.add(
+        #     Activity(
+        #         id=create_int_uid(),
+        #         name='abobus',
+        #         emoji='💰',
+        #         description='иди нахуй пон',
+        #         fund=20000,
+        #         total_places=20,
+        #         occupied_places=0,
+        #         started_on=datetime.now(),
+        #         deadline=datetime.now() + timedelta(days=14),
+        #         is_running=True
+        #     )
+        # )
+        # await self._session.commit()
 
         if category is None:
             raise CategoryNotFoundError()
