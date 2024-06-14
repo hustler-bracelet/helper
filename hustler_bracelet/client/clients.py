@@ -220,9 +220,9 @@ class ProofsAPIClient(BaseAPIClient):
             many_result=True,
         )
 
-    async def accept_proof(self, proof_id: int):
+    async def accept_proof(self, proof_id: int, extra_points: int = 0):
         await self.api_request(
-            endpoint=f'/proofs/{proof_id}/accept',
+            endpoint=f'/proofs/{proof_id}/accept?extra_points={extra_points}',
             method='POST',
             schema=None,
         )

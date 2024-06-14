@@ -193,3 +193,7 @@ class AdminCreateTask(StatesGroup):
     TASK_TEXT = State()
     TASK_POINTS = State()
     TASK_DEADLINE = State()
+
+
+class AdminProofAddPoints(StatesGroup):
+    ADD_POINT = State()

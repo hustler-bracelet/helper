@@ -347,11 +347,19 @@ def generate_proofs_kb(proof_id: int, pagination) -> types.InlineKeyboardMarkup:
                         text='❌ Отклонить',
                         callback_data=f'admin:reject_proofs:{proof_id}'
                     ),
+                ],
+                [
                     types.InlineKeyboardButton(
                         text='✅ Подтвердить',
                         callback_data=f'admin:accept_proofs:{proof_id}'
                     ),
-                ]
+                ],
+                [
+                    types.InlineKeyboardButton(
+                        text='✅ Подтвердить +баллы',
+                        callback_data=f'admin:points_accept_proofs:{proof_id}'
+                    ),
+                ],
             ],
         )
     return types.InlineKeyboardMarkup(
@@ -377,6 +385,7 @@ async def paginate_proof(callback: types.CallbackQuery, bot: Bot, state: FSMCont
 
     if callback.data.startswith('admin:check_proofs'):
         activity_id = callback.data.split(':')[-1]
+        await state.update_data(activity_id=activity_id)
     else:
         data = await state.get_data()
         activity_id = data['activity_id']
@@ -561,6 +570,58 @@ async def start_activity(callback: types.CallbackQuery, state: FSMContext):
                     types.InlineKeyboardButton(
                         text='✅ Ок',
                         callback_data=f'admin:view_activity'
+                    ),
+                ]
+            ]
+        )
+    )
+
+
+@admin_router.callback_query(F.data.startswith('admin:points_accept_proofs:'))
+async def points_accept_proofs(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    proof_id = int(callback.data.split(':')[-1])
+    proofs: list[ProofLoadedReasonse] = data['proofs']
+
+    proof = None
+    for item in proofs:
+        if item.id == proof_id:
+            proof = item
+
+    if not proof:
+        await callback.answer('❌ Произошла ошибка')
+        return
+
+    await state.set_state(states.AdminProofAddPoints.ADD_POINT)
+    await state.update_data(proof_id=proof_id)
+    await callback.message.answer(
+        '💎 <b>Напиши кол-во баллов, которое хочешь добавить</b>\n\n'
+        'ℹ️ Помни, что ты пишешь сколько баллов нужно добавить к базовому значению.'
+    )
+
+
+@admin_router.message(states.AdminProofAddPoints.ADD_POINT)
+async def points_accept_proofs(message: types.Message, state: FSMContext):
+    if not message.text.isdigit():
+        await message.answer('Нужно ввести число')
+        return
+
+    data = await state.get_data()
+    proof_id = data['proof_id']
+
+    activity_id = data['activity_id']
+
+    await proofs_client.accept_proof(proof_id, extra_points=int(message.text))
+
+    await state.set_state(None)
+    await message.answer(
+        f'✅ Готово! Пользователь получил дополнительные + {message.text} баллов.',
+        reply_markup=types.InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    types.InlineKeyboardButton(
+                        text='Главное меню',
+                        callback_data=f'admin:view_activity:{activity_id}'
                     ),
                 ]
             ]
