@@ -17,6 +17,7 @@ from hustler_bracelet.enums import (
     TransactionStatus,
     ActivityUserEventType,
     ActivityTaskUserEventType,
+    NotificationType,
 )
 
 
@@ -208,3 +209,12 @@ class ActivityTaskUserEvent(BaseModel):
     telegram_id: Mapped[int] = mapped_column(ForeignKey('user.telegram_id'))
     activity_task_id: Mapped[int] = mapped_column(ForeignKey('activity_task.id'))
     added_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class NotificationRecords(BaseModel):
+    __tablename__ = "notification_records"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(ForeignKey('user.telegram_id'))
+    type: Mapped[NotificationType] = mapped_column(Enum(NotificationType))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -43,3 +43,7 @@ class ActivityUserEventType(str, Enum):
 class ActivityTaskUserEventType(str, Enum):
     JOIN = 'JOIN'
     LEAVE = 'LEAVE'
+
+
+class NotificationType(str, Enum):
+    SUB_END_IN_3_DAYS = 'SUB_END_IN_3_DAYS'
